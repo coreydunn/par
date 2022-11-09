@@ -1,0 +1,19 @@
+par
+
+Turn something in a human readable computer language like
+print('hello');
+
+into an intermediate form that can be used programmatically
+___________________________________________________________
+
+Lexer
+
+* Find patterns of characters [DONE]
+* Define syntactical types [DONE]
+* Preidentifiers --> (identifier|keyword)
+* Fix string type
+
+Parser
+
+* Find patterns of lexemes
+* Define grammatical structures
