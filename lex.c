@@ -25,12 +25,14 @@ void lex_free(Lexer*l)
 	vec_free(&(l->lexemes));
 }
 
-// Read string and store lexemes
+// Read string and store tokens
 void lex_string(Lexer*l,char*s)
 {
 	Str tmp=str_new();
 	char t[2]={0};
 	size_t strl;
+	char*operators="+=;";
+	char*keywords[]={"for","while","do"};
 
 	if(!l||!s)return;
 
@@ -85,7 +87,7 @@ void lex_string(Lexer*l,char*s)
 					//t[0]=s[i];str_append(&tmp,t);
 				}
 
-				else if(s[i]&&strchr("+=",s[i]))
+				else if(s[i]&&strchr(operators,s[i]))
 				{
 					l->mode=OPERATOR;
 					--i;
@@ -105,6 +107,15 @@ void lex_string(Lexer*l,char*s)
 					l->mode=NONE;
 					--i;
 					str_assign(&((Lexeme*)l->lexemes.buffer)[l->lexemes.size-1].str,tmp.buffer);
+					for(size_t j=0;j<sizeof(keywords)/sizeof(char*);++j)
+					{
+
+						//int t=strcmp(keywords[j],tmp.buffer);
+						//printf("strcmp(\"%s\",\"%s\"): %d\n",keywords[j],tmp.buffer,t);
+
+						if(strcmp(keywords[j],tmp.buffer)==0)
+							((Lexeme*)l->lexemes.buffer)[l->lexemes.size-1].type=KEYWORD;
+					}
 				}t[0]=s[i];str_append(&tmp,t);
 				break;
 
@@ -127,7 +138,7 @@ void lex_string(Lexer*l,char*s)
 				break;
 
 			case OPERATOR:
-				if(!s[i]||!strchr("+=",s[i]))
+				if(!s[i]||!strchr(operators,s[i]))
 				{
 					l->mode=NONE;
 					--i;

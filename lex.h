@@ -11,7 +11,7 @@
 
 #define vec_pushl(v,l) do{Lexeme x=l;vec_push(v,&x);}while(0)
 
-enum LEXTYPE {NONE, IDENTIFIER, INTEGER, STRING, OPERATOR};
+enum LEXTYPE {NONE, IDENTIFIER, INTEGER, STRING, OPERATOR, KEYWORD};
 
 typedef struct Lexeme
 {
