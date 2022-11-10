@@ -11,7 +11,7 @@ Lexer lex_new(void)
 {
 	Lexer l={
 		.mode=NONE,
-		.tokens=vec_new(sizeof(Lexeme)),
+		.tokens=vec_new(sizeof(Tok)),
 	};
 
 	return l;
@@ -21,7 +21,7 @@ void lex_free(Lexer*l)
 {
 	if(!l)return;
 	for(size_t i=0;i<l->tokens.size;++i)
-		str_free(&((Lexeme*)l->tokens.buffer)[i].str);
+		str_free(&((Tok*)l->tokens.buffer)[i].str);
 	vec_free(&(l->tokens));
 }
 
@@ -36,7 +36,7 @@ void lex_string(Lexer*l,char*s)
 
 	if(!l||!s)return;
 
-	//vec_pushl(&l->tokens,((Lexeme){
+	//vec_pushl(&l->tokens,((Tok){
 			//.str=str_new(),
 			//.type=NONE})
 			//);
@@ -55,7 +55,7 @@ void lex_string(Lexer*l,char*s)
 			// Starting condition
 			/*****
 			 * When we find a new lexeme,
-			 * push a new Lexeme to the vector
+			 * push a new Tok to the vector
 			 * and set its type to the Lexer
 			 * mode and initialize its str
 			 *****/
@@ -66,7 +66,7 @@ void lex_string(Lexer*l,char*s)
 				{
 					l->mode=IDENTIFIER;
 					--i;
-					vec_pushl(&l->tokens,((Lexeme){.str=str_new(),.type=l->mode}));
+					vec_pushl(&l->tokens,((Tok){.str=str_new(),.type=l->mode}));
 					str_clear(&tmp);
 				}
 
@@ -74,7 +74,7 @@ void lex_string(Lexer*l,char*s)
 				{
 					l->mode=STRING;
 					//--i;
-					vec_pushl(&l->tokens,((Lexeme){.str=str_new(),.type=l->mode}));
+					vec_pushl(&l->tokens,((Tok){.str=str_new(),.type=l->mode}));
 					str_clear(&tmp);
 				}
 
@@ -82,7 +82,7 @@ void lex_string(Lexer*l,char*s)
 				{
 					l->mode=INTEGER;
 					--i;
-					vec_pushl(&l->tokens,((Lexeme){.str=str_new(),.type=l->mode}));
+					vec_pushl(&l->tokens,((Tok){.str=str_new(),.type=l->mode}));
 					str_clear(&tmp);
 					//t[0]=s[i];str_append(&tmp,t);
 				}
@@ -92,10 +92,10 @@ void lex_string(Lexer*l,char*s)
 					l->mode=OPERATOR;
 					--i;
 					// not copying the operator string
-					vec_pushl(&l->tokens,((Lexeme){.str=str_new(),.type=l->mode}));
+					vec_pushl(&l->tokens,((Tok){.str=str_new(),.type=l->mode}));
 					str_clear(&tmp);
 					//t[0]=s[i];str_append(&tmp,t);
-					//str_assign(&((Lexeme*)l->tokens.buffer)[l->tokens.size-1].str,tmp.buffer);
+					//str_assign(&((Tok*)l->tokens.buffer)[l->tokens.size-1].str,tmp.buffer);
 					//l->mode=NONE;
 				}
 				break;
@@ -106,7 +106,7 @@ void lex_string(Lexer*l,char*s)
 				{
 					l->mode=NONE;
 					--i;
-					str_assign(&((Lexeme*)l->tokens.buffer)[l->tokens.size-1].str,tmp.buffer);
+					str_assign(&((Tok*)l->tokens.buffer)[l->tokens.size-1].str,tmp.buffer);
 					for(size_t j=0;j<sizeof(keywords)/sizeof(char*);++j)
 					{
 
@@ -114,7 +114,7 @@ void lex_string(Lexer*l,char*s)
 						//printf("strcmp(\"%s\",\"%s\"): %d\n",keywords[j],tmp.buffer,t);
 
 						if(strcmp(keywords[j],tmp.buffer)==0)
-							((Lexeme*)l->tokens.buffer)[l->tokens.size-1].type=KEYWORD;
+							((Tok*)l->tokens.buffer)[l->tokens.size-1].type=KEYWORD;
 					}
 				}t[0]=s[i];str_append(&tmp,t);
 				break;
@@ -124,7 +124,7 @@ void lex_string(Lexer*l,char*s)
 				{
 					l->mode=NONE;
 					--i;
-					str_assign(&((Lexeme*)l->tokens.buffer)[l->tokens.size-1].str,tmp.buffer);
+					str_assign(&((Tok*)l->tokens.buffer)[l->tokens.size-1].str,tmp.buffer);
 				}t[0]=s[i];str_append(&tmp,t);
 				break;
 
@@ -133,7 +133,7 @@ void lex_string(Lexer*l,char*s)
 				{
 					l->mode=NONE;
 					//--i;
-					str_assign(&((Lexeme*)l->tokens.buffer)[l->tokens.size-1].str,tmp.buffer);
+					str_assign(&((Tok*)l->tokens.buffer)[l->tokens.size-1].str,tmp.buffer);
 				}t[0]=s[i];str_append(&tmp,t);
 				break;
 
@@ -142,7 +142,7 @@ void lex_string(Lexer*l,char*s)
 				{
 					l->mode=NONE;
 					--i;
-					str_assign(&((Lexeme*)l->tokens.buffer)[l->tokens.size-1].str,tmp.buffer);
+					str_assign(&((Tok*)l->tokens.buffer)[l->tokens.size-1].str,tmp.buffer);
 				}t[0]=s[i];str_append(&tmp,t);
 				break;
 
@@ -158,8 +158,8 @@ void lex_print(Lexer*l)
 	for(size_t i=0;i<l->tokens.size;++i)
 	{
 		printf("'%s'(%u)",
-				((Lexeme*)l->tokens.buffer)[i].str.buffer,
-				((Lexeme*)l->tokens.buffer)[i].type
+				((Tok*)l->tokens.buffer)[i].str.buffer,
+				((Tok*)l->tokens.buffer)[i].type
 				);
 		if(i<l->tokens.size-1)
 			printf(", ");

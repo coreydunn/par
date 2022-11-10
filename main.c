@@ -20,7 +20,7 @@ int main(int argc,char**argv)
 		str_assign(&string,argv[1]);
 
 	for(size_t i=0;i<lexer.tokens.size;++i)
-		printf("[%lu] type: %u\n",i,((Lexeme*)vec_at(&lexer.tokens,i))->type);
+		printf("[%lu] type: %u\n",i,((Tok*)vec_at(&lexer.tokens,i))->type);
 
 	lex_string(&lexer,string.buffer);
 

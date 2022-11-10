@@ -5,6 +5,7 @@
 #include<stdbool.h>
 #include<stdint.h>
 #include"lex.h"
+#include"tok.h"
 #include"str.h"
 
 /******

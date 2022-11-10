@@ -8,16 +8,17 @@
 #include<unistd.h>
 #include"vec.h"
 #include"str.h"
+#include"tok.h"
 
-#define vec_pushl(v,l) do{Lexeme x=l;vec_push(v,&x);}while(0)
+#define vec_pushl(v,l) do{Tok x=l;vec_push(v,&x);}while(0)
 
 enum LEXTYPE {NONE, IDENTIFIER, INTEGER, STRING, OPERATOR, KEYWORD};
 
-typedef struct Lexeme
-{
-	Str str;
-	uint32_t type;
-} Lexeme;
+//typedef struct Tok
+//{
+	//Str str;
+	//uint32_t type;
+//} Tok;
 
 typedef struct Lexer
 {

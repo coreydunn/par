@@ -7,8 +7,8 @@ void par_tokens(Par*p,Lexer*l)
 	for(size_t i=0;i<l->tokens.size;++i)
 	{
 
-		Lexeme tok=*(Lexeme*)vec_at(&l->tokens,i);
-		printf("%s",((Lexeme*)l->tokens.buffer)[i].str.buffer);
+		Tok tok=*(Tok*)vec_at(&l->tokens,i);
+		printf("%s",tok.str.buffer);
 		switch(p->mode)
 		{
 			case STATEMENT:
@@ -27,7 +27,7 @@ void par_tokens(Par*p,Lexer*l)
 						break;
 
 				}
-				//printf("%s",((Lexeme*)l->tokens.buffer)[i].str.buffer);
+				//printf("%s",((Tok*)l->tokens.buffer)[i].str.buffer);
 				break;
 		}
 	}
