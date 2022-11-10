@@ -12,7 +12,7 @@ int main(int argc,char**argv)
 	Lexer lexer=lex_new();
 
 	if(argc<2)
-		str_assign(&string,"x 12 fishes trees		_Abbc98zy 9999");
+		str_assign(&string,"x 12 \"fishes\" trees		_Abbc98zy 9999");
 	else
 		str_assign(&string,argv[1]);
 

@@ -69,7 +69,7 @@ void lex_string(Lexer*l,char*s)
 				else if(s[i]=='"')
 				{
 					l->mode=STRING;
-					--i;
+					//--i;
 					vec_pushl(&l->lexemes,((Lexeme){.str=str_new(),.type=l->mode}));
 					str_clear(&tmp);
 				}
@@ -105,7 +105,8 @@ void lex_string(Lexer*l,char*s)
 				if(s[i]=='"')
 				{
 					l->mode=NONE;
-					--i;
+					//--i;
+					str_assign(&((Lexeme*)l->lexemes.buffer)[l->lexemes.size-1].str,tmp.buffer);
 				}t[0]=s[i];str_append(&tmp,t);
 				break;
 

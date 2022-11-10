@@ -11,7 +11,7 @@ Lexer
 * Find patterns of characters [DONE]
 * Define syntactical types [DONE]
 * Preidentifiers --> (identifier|keyword)
-* Fix string type
+* Fix string type [DONE]
 
 Parser
 
