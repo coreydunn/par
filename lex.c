@@ -45,6 +45,7 @@ void lex_string(Lexer*l,char*s)
 	// Read each individual byte
 	for(size_t i=0;i<strl;++i)
 	{
+
 		switch(l->mode)
 		{
 
@@ -56,6 +57,7 @@ void lex_string(Lexer*l,char*s)
 			 * and set its type to the Lexer
 			 * mode and initialize its str
 			 *****/
+
 			case NONE:
 			default:
 				if(isalpha(s[i])||s[i]=='_')
@@ -80,11 +82,25 @@ void lex_string(Lexer*l,char*s)
 					--i;
 					vec_pushl(&l->lexemes,((Lexeme){.str=str_new(),.type=l->mode}));
 					str_clear(&tmp);
+					//t[0]=s[i];str_append(&tmp,t);
+				}
+
+				else if(s[i]&&strchr("+=",s[i]))
+				{
+					l->mode=OPERATOR;
+					--i;
+					// not copying the operator string
+					vec_pushl(&l->lexemes,((Lexeme){.str=str_new(),.type=l->mode}));
+					str_clear(&tmp);
+					//t[0]=s[i];str_append(&tmp,t);
+					//str_assign(&((Lexeme*)l->lexemes.buffer)[l->lexemes.size-1].str,tmp.buffer);
+					//l->mode=NONE;
 				}
 				break;
 
+				// Individual modes
 			case IDENTIFIER:
-				if(!isalnum(s[i])&&s[i]!='_')
+				if(!s[i]||(!isalnum(s[i])&&s[i]!='_'))
 				{
 					l->mode=NONE;
 					--i;
@@ -93,7 +109,7 @@ void lex_string(Lexer*l,char*s)
 				break;
 
 			case INTEGER:
-				if(!isdigit(s[i]))
+				if(!s[i]||!isdigit(s[i]))
 				{
 					l->mode=NONE;
 					--i;
@@ -102,10 +118,19 @@ void lex_string(Lexer*l,char*s)
 				break;
 
 			case STRING:
-				if(s[i]=='"')
+				if(!s[i]||s[i]=='"')
 				{
 					l->mode=NONE;
-					//--i;
+					--i;
+					str_assign(&((Lexeme*)l->lexemes.buffer)[l->lexemes.size-1].str,tmp.buffer);
+				}t[0]=s[i];str_append(&tmp,t);
+				break;
+
+			case OPERATOR:
+				if(!s[i]||!strchr("+=",s[i]))
+				{
+					l->mode=NONE;
+					--i;
 					str_assign(&((Lexeme*)l->lexemes.buffer)[l->lexemes.size-1].str,tmp.buffer);
 				}t[0]=s[i];str_append(&tmp,t);
 				break;

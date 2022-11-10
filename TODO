@@ -12,6 +12,7 @@ Lexer
 * Define syntactical types [DONE]
 * Preidentifiers --> (identifier|keyword)
 * Fix string type [DONE]
+* Fix operator type
 
 Parser
 
