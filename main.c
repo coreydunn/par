@@ -13,7 +13,7 @@ int main(int argc,char**argv)
 	Vec keywords=vec_new(sizeof(Str));
 
 	if(argc<2)
-		str_assign(&string,"x 12 \"fishes are neat\" trees	+	_Abbc98zy 9999");
+		str_assign(&string,"x=253 y=\"string\"");
 	else
 		str_assign(&string,argv[1]);
 

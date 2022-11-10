@@ -121,7 +121,7 @@ void lex_string(Lexer*l,char*s)
 				if(!s[i]||s[i]=='"')
 				{
 					l->mode=NONE;
-					--i;
+					//--i;
 					str_assign(&((Lexeme*)l->lexemes.buffer)[l->lexemes.size-1].str,tmp.buffer);
 				}t[0]=s[i];str_append(&tmp,t);
 				break;
