@@ -21,7 +21,7 @@ typedef struct Lexeme
 
 typedef struct Lexer
 {
-	Vec lexemes;
+	Vec tokens;
 	uint32_t mode;
 } Lexer;
 

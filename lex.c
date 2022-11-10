@@ -11,7 +11,7 @@ Lexer lex_new(void)
 {
 	Lexer l={
 		.mode=NONE,
-		.lexemes=vec_new(sizeof(Lexeme)),
+		.tokens=vec_new(sizeof(Lexeme)),
 	};
 
 	return l;
@@ -20,9 +20,9 @@ Lexer lex_new(void)
 void lex_free(Lexer*l)
 {
 	if(!l)return;
-	for(size_t i=0;i<l->lexemes.size;++i)
-		str_free(&((Lexeme*)l->lexemes.buffer)[i].str);
-	vec_free(&(l->lexemes));
+	for(size_t i=0;i<l->tokens.size;++i)
+		str_free(&((Lexeme*)l->tokens.buffer)[i].str);
+	vec_free(&(l->tokens));
 }
 
 // Read string and store tokens
@@ -31,12 +31,12 @@ void lex_string(Lexer*l,char*s)
 	Str tmp=str_new();
 	char t[2]={0};
 	size_t strl;
-	char*operators="+=;";
-	char*keywords[]={"for","while","do"};
+	char*operators="-+*/=;()";
+	char*keywords[]={"for","while","do","true","false"};
 
 	if(!l||!s)return;
 
-	//vec_pushl(&l->lexemes,((Lexeme){
+	//vec_pushl(&l->tokens,((Lexeme){
 			//.str=str_new(),
 			//.type=NONE})
 			//);
@@ -66,7 +66,7 @@ void lex_string(Lexer*l,char*s)
 				{
 					l->mode=IDENTIFIER;
 					--i;
-					vec_pushl(&l->lexemes,((Lexeme){.str=str_new(),.type=l->mode}));
+					vec_pushl(&l->tokens,((Lexeme){.str=str_new(),.type=l->mode}));
 					str_clear(&tmp);
 				}
 
@@ -74,7 +74,7 @@ void lex_string(Lexer*l,char*s)
 				{
 					l->mode=STRING;
 					//--i;
-					vec_pushl(&l->lexemes,((Lexeme){.str=str_new(),.type=l->mode}));
+					vec_pushl(&l->tokens,((Lexeme){.str=str_new(),.type=l->mode}));
 					str_clear(&tmp);
 				}
 
@@ -82,7 +82,7 @@ void lex_string(Lexer*l,char*s)
 				{
 					l->mode=INTEGER;
 					--i;
-					vec_pushl(&l->lexemes,((Lexeme){.str=str_new(),.type=l->mode}));
+					vec_pushl(&l->tokens,((Lexeme){.str=str_new(),.type=l->mode}));
 					str_clear(&tmp);
 					//t[0]=s[i];str_append(&tmp,t);
 				}
@@ -92,10 +92,10 @@ void lex_string(Lexer*l,char*s)
 					l->mode=OPERATOR;
 					--i;
 					// not copying the operator string
-					vec_pushl(&l->lexemes,((Lexeme){.str=str_new(),.type=l->mode}));
+					vec_pushl(&l->tokens,((Lexeme){.str=str_new(),.type=l->mode}));
 					str_clear(&tmp);
 					//t[0]=s[i];str_append(&tmp,t);
-					//str_assign(&((Lexeme*)l->lexemes.buffer)[l->lexemes.size-1].str,tmp.buffer);
+					//str_assign(&((Lexeme*)l->tokens.buffer)[l->tokens.size-1].str,tmp.buffer);
 					//l->mode=NONE;
 				}
 				break;
@@ -106,7 +106,7 @@ void lex_string(Lexer*l,char*s)
 				{
 					l->mode=NONE;
 					--i;
-					str_assign(&((Lexeme*)l->lexemes.buffer)[l->lexemes.size-1].str,tmp.buffer);
+					str_assign(&((Lexeme*)l->tokens.buffer)[l->tokens.size-1].str,tmp.buffer);
 					for(size_t j=0;j<sizeof(keywords)/sizeof(char*);++j)
 					{
 
@@ -114,7 +114,7 @@ void lex_string(Lexer*l,char*s)
 						//printf("strcmp(\"%s\",\"%s\"): %d\n",keywords[j],tmp.buffer,t);
 
 						if(strcmp(keywords[j],tmp.buffer)==0)
-							((Lexeme*)l->lexemes.buffer)[l->lexemes.size-1].type=KEYWORD;
+							((Lexeme*)l->tokens.buffer)[l->tokens.size-1].type=KEYWORD;
 					}
 				}t[0]=s[i];str_append(&tmp,t);
 				break;
@@ -124,7 +124,7 @@ void lex_string(Lexer*l,char*s)
 				{
 					l->mode=NONE;
 					--i;
-					str_assign(&((Lexeme*)l->lexemes.buffer)[l->lexemes.size-1].str,tmp.buffer);
+					str_assign(&((Lexeme*)l->tokens.buffer)[l->tokens.size-1].str,tmp.buffer);
 				}t[0]=s[i];str_append(&tmp,t);
 				break;
 
@@ -133,7 +133,7 @@ void lex_string(Lexer*l,char*s)
 				{
 					l->mode=NONE;
 					//--i;
-					str_assign(&((Lexeme*)l->lexemes.buffer)[l->lexemes.size-1].str,tmp.buffer);
+					str_assign(&((Lexeme*)l->tokens.buffer)[l->tokens.size-1].str,tmp.buffer);
 				}t[0]=s[i];str_append(&tmp,t);
 				break;
 
@@ -142,7 +142,7 @@ void lex_string(Lexer*l,char*s)
 				{
 					l->mode=NONE;
 					--i;
-					str_assign(&((Lexeme*)l->lexemes.buffer)[l->lexemes.size-1].str,tmp.buffer);
+					str_assign(&((Lexeme*)l->tokens.buffer)[l->tokens.size-1].str,tmp.buffer);
 				}t[0]=s[i];str_append(&tmp,t);
 				break;
 
@@ -155,13 +155,13 @@ void lex_string(Lexer*l,char*s)
 void lex_print(Lexer*l)
 {
 	printf("%p: [",l);
-	for(size_t i=0;i<l->lexemes.size;++i)
+	for(size_t i=0;i<l->tokens.size;++i)
 	{
 		printf("'%s'(%u)",
-				((Lexeme*)l->lexemes.buffer)[i].str.buffer,
-				((Lexeme*)l->lexemes.buffer)[i].type
+				((Lexeme*)l->tokens.buffer)[i].str.buffer,
+				((Lexeme*)l->tokens.buffer)[i].type
 				);
-		if(i<l->lexemes.size-1)
+		if(i<l->tokens.size-1)
 			printf(", ");
 	}
 	printf("]\n");
