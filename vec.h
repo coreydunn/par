@@ -11,6 +11,7 @@
 #define vec_pushi(v,i) do{int x=i;vec_push((v),&x);}while(0)
 #define vec_pushc(v,c) do{char x=c;vec_push((v),&x);}while(0)
 #define vec_pushf(v,f) do{float x=f;if(!(v)->isfloat)(v)->isfloat=true;vec_push((v),&x);}while(0)
+#define vec_pushs(v,s) do{Str x=str_new();str_assign(&x,s);vec_push((v),&x);}while(0)
 
 typedef struct Vec
 {
