@@ -2,10 +2,25 @@
 
 #include<stdio.h>
 #include<stdlib.h>
+#include<stdbool.h>
+#include<stdint.h>
 #include"lex.h"
 #include"str.h"
 
-enum PARTYPE {/*NONE,*/ STATEMENT=1, EXPRESSION};
+/******
+ * Grammar:
+ * STATEMENT:	EXPRESSION ';'
+ * 				|IDENTIFIER(ARGLIST){STATEMENT}
+ * 				|'if'(EXPRESSION){STATEMENT}
+ * 				|'while'(EXPRESSION){STATEMENT}
+ * EXPRESSION:	INTEGER
+ * 				|IDENTIFIER
+ * 				|INTEGER OPERATOR EXPRESSION
+ * 				|IDENTIFIER OPERATOR EXPRESSION
+ * ARGLIST:		TYPENAME IDENTIFIER
+ * 				|TYPENAME IDENTIFIER ',' ARGLIST
+ ******/
+enum PARTYPE {STATEMENT, EXPRESSION};
 
 typedef struct Par
 {
