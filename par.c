@@ -1,13 +1,13 @@
 #include"par.h"
 #include"lex.h"
 
-void par_tokens(Par*p,Lexer*l)
+void par_tokens(Par*p,Vec*tokens)
 {
 
-	for(size_t i=0;i<l->tokens.size;++i)
+	for(size_t i=0;i<tokens->size;++i)
 	{
 
-		Tok tok=*(Tok*)vec_at(&l->tokens,i);
+		Tok tok=*(Tok*)vec_at(tokens,i);
 		printf("%s",tok.str.buffer);
 		switch(p->mode)
 		{
@@ -27,7 +27,7 @@ void par_tokens(Par*p,Lexer*l)
 						break;
 
 				}
-				//printf("%s",((Tok*)l->tokens.buffer)[i].str.buffer);
+				//printf("%s",((Tok*)tokens->buffer)[i].str.buffer);
 				break;
 		}
 	}

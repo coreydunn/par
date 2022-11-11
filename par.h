@@ -28,4 +28,5 @@ typedef struct Par
 	uint32_t mode;
 } Par;
 
-void par_tokens(Par*p,Lexer*l);
+// tokens should be a vector of Tok structs
+void par_tokens(Par*p,Vec*tokens);

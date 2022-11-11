@@ -15,7 +15,7 @@ int main(int argc,char**argv)
 	//Vec keywords=vec_new(sizeof(Str));
 
 	if(argc<2)
-		str_assign(&string,"x=253; y=\"string\";");
+		str_assign(&string,"while(true)\n{\nx=253;\ny=\"string\";\n}");
 	else
 		str_assign(&string,argv[1]);
 
@@ -38,7 +38,7 @@ int main(int argc,char**argv)
 	printf("tokens: ");
 	lex_print(&lexer);
 
-	par_tokens(&par,&lexer);
+	par_tokens(&par,&lexer.tokens);
 
 	//for(size_t i=0;i<keywords.size;++i)
 		//str_free(((Str*)vec_at(&keywords,i)));
