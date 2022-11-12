@@ -54,8 +54,9 @@ int main(int argc,char**argv)
 	printf("!!!test ParseNode\n");
 	{
 		ParseNode pn=par_new();
-		vec_pushpn(&pn.children,par_new());
-		vec_pushpn(&pn.children,par_new());
+		par_push(&pn);
+		par_push(&pn);
+		par_push(&pn);
 		par_print(&pn);
 		par_free(&pn);
 	}

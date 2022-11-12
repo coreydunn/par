@@ -27,3 +27,9 @@ void par_free(ParseNode*pn)
 		vec_free(&pn->children);
 	}
 }
+
+void par_push(ParseNode*pn)
+{
+	if(!pn)return;
+	vec_pushpn(&pn->children,par_new());
+}

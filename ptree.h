@@ -23,3 +23,4 @@ typedef struct Parser
 
 ParseNode par_new(void);
 void par_free(ParseNode*pn);
+void par_push(ParseNode*pn);
