@@ -5,13 +5,13 @@
 #include"vec.h"
 #include"lex.h"
 #include"str.h"
-#include"par.h"
+//#include"par.h"
 #include"ptree.h"
 
 int main(int argc,char**argv)
 {
 	Str string=str_new();
-	Par par;
+	//Par par;
 	Lexer lexer=lex_new();
 
 	// Determine string to lex/parse
@@ -36,21 +36,26 @@ int main(int argc,char**argv)
 
 	// PARSE
 	// Parse lexemes
-	par_tokens(&par,&lexer.tokens);
+	//par_tokens(&par,&lexer.tokens);
 
 	// ParseNode
 	printf("!!! test ParseNode\n");
 	{
-		ParseNode pn=par_new();
+		Parser p={.mode=0,.root=par_new()};
 
-		par_push(&pn);
-		//vec_push(&pn.tokens,"what now");
-		par_push(&pn);
-		par_push(&pn);
+		// Push tokens to parser tree root node
+		par_push(&p.root);
+		//vec_push(&p.root.tokens,"what now");
+		par_push(&p.root);
+		par_push(&p.root);
 
-		printf("push: ");par_print(&pn);
-		par_free(&pn);
-		printf("free: ");par_print(&pn);
+		// Parse tokens
+		par_tokens(&p,&lexer.tokens);
+
+		// Print, free, print
+		printf("push: ");par_print(&p.root);
+		par_free(&p.root);
+		printf("free: ");par_print(&p.root);
 	}
 	printf("!!!\n");
 
