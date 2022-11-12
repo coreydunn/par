@@ -1,6 +1,8 @@
 #include"par.h"
 #include"lex.h"
 
+// NOTE: This function will probably need
+// to be called recursively
 void par_tokens(Par*p,Vec*tokens)
 {
 
@@ -19,7 +21,10 @@ void par_tokens(Par*p,Vec*tokens)
 					case IDENTIFIER:
 					case OPERATOR:
 						if(strcmp(tok.str.buffer,";")==0)
+						{
+							//if()
 							printf(" # end statement\n");
+						}
 
 					case STRING:
 					case KEYWORD:
