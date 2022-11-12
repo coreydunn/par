@@ -8,7 +8,8 @@ ParseNode par_new(void)
 {
 	ParseNode pn={
 		.tokens=vec_new(sizeof(Tok)),
-		.children=vec_new(sizeof(ParseNode))
+		.children=vec_new(sizeof(ParseNode)),
+		.type=7,
 	};
 
 	return pn;

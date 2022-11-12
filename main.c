@@ -8,6 +8,19 @@
 #include"par.h"
 #include"ptree.h"
 
+void par_print(ParseNode*p)
+{
+	printf("%p: [",p);
+	for(size_t i=0;i<p->children.size;++i)
+	{
+		//printf("%lu",((ParseNode*)p->children)[i].type);
+		printf("%lu:%u",i,((ParseNode*)p->children.buffer)[i].type);
+		if(i<p->children.size-1)
+			printf(", ");
+	}
+	printf("]\n");
+}
+
 int main(int argc,char**argv)
 {
 	Str string=str_new();
@@ -41,10 +54,9 @@ int main(int argc,char**argv)
 	printf("!!!test ParseNode\n");
 	{
 		ParseNode pn=par_new();
-		printf("ParseNode: ");
-		printf("tokens: (%lu/%lu) ",pn.tokens.size,pn.tokens.capacity);
-		printf("children: (%lu/%lu)",pn.children.size,pn.children.capacity);
-		printf("\n");
+		vec_pushpn(&pn.children,par_new());
+		vec_pushpn(&pn.children,par_new());
+		par_print(&pn);
 		par_free(&pn);
 	}
 	printf("!!!\n\n");
