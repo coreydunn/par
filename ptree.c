@@ -73,11 +73,25 @@ void par_tokens(Parser*p,Vec*tokens)
 						{
 							//if()
 							printf(" # end statement\n");
+							// TODO: add current tokens to a new ParseNode,
+							// then push the ParseNode to the tree root
+							par_push(&p->root);
+							ParseNode*n=&((ParseNode*)p->root.children.buffer)[p->root.children.size-1];
+							for(size_t j=0;j<tmp.size;++j)
+							{
+								vec_pusht(&n->tokens,((Tok){.str=str_new(),.type=0}));
+								//str_assign(&((Tok*)n->tokens.buffer)[n->tokens.size-1],((Tok*)tmp.buffer)[tmp.size-1].str.buffer);
+							}
+							//n->tokens
 						}
 
 					case STRING:
 					case KEYWORD:
 					default:
+						// TODO: push current token to the temporary
+						// token Vec
+						// May need a tok_clear function
+						vec_pusht(&tmp,tok);
 						break;
 
 				}

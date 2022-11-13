@@ -5,7 +5,7 @@
 #include<unistd.h>
 #include"lex.h"
 
-#define vec_pusht(v,s) do{Tok x=(Tok){.str=str_new(),type=0};vec_push((v),&x);}while(0)
+#define vec_pusht(v,s) do{Tok x=(Tok){.str=str_new(),.type=0};vec_push((v),&x);}while(0)
 
 typedef struct Tok
 {
