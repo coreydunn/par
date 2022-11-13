@@ -17,7 +17,7 @@ Vec vec_new(size_t unitsize)
 
 void vec_print(Vec*v,const char*fmt)
 {
-	printf("%p: sz=%lu (%lu/%lu): [",&v,v->unitsize,v->size,v->capacity);
+	printf("%p: sz=%lu (%lu/%lu): [",v,v->unitsize,v->size,v->capacity);
 	for(size_t i=0;i<v->size;++i)
 	{
 
