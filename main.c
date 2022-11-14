@@ -34,14 +34,12 @@ int main(int argc,char**argv)
 	// Create Parsing tree
 	parser_tokens(&parser,&lexer.tokens);
 
-	// Copy tokens
-	for(size_t i=0;i<lexer.tokens.size;++i)
-		vec_pushta(&parser.root.tokens,(((Tok*)lexer.tokens.buffer)[i].str.buffer));
+	lex_free(&lexer);
 
 	pnode_print(&parser.root,0);
 
 	// Free memory and leave
 	pnode_free(&parser.root);
-	lex_free(&lexer);
+	//lex_free(&lexer);
 	str_free(&string);
 }

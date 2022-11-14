@@ -84,7 +84,14 @@ void parser_tokens(Parser*p,Vec*t)
 {
 	if(!p)return;
 	if(!t)return;
+
 	pnode_pushnode(&p->root);
 	pnode_pushnode(&p->root);
 	pnode_pushnode(&p->root);
+
+	// Copy tokens
+	for(size_t i=0;i<t->size;++i)
+		vec_pushta(&p->root.tokens,(((Tok*)t->buffer)[i].str.buffer));
+		//vec_pushta(&parser.root.tokens,(((Tok*)lexer.tokens.buffer)[i].str.buffer));
+
 }
