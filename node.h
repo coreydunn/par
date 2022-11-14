@@ -10,6 +10,7 @@
 typedef struct Node
 {
 	Str str;
+	Vec tokens;
 	Vec nodes;
 } Node;
 
