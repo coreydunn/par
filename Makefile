@@ -2,7 +2,7 @@ CFLAGS=   -Wfatal-errors -Wall
 LDFLAGS=  -s
 OBJS=     p
 
-all: $(OBJS) c
+all: $(OBJS)
 %.o: %.c %.h
 	$(CC) $< -c $(CFLAGS)
 test: test.o lex.o vec.o str.o tok.o
