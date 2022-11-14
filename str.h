@@ -16,6 +16,7 @@ typedef struct Str
 } Str;
 
 Str str_new(void);
+Str str_newa(char*c);
 void str_append(Str*s,char*c);
 void str_assign(Str*s,char*c);
 void str_clear(Str*s);
@@ -23,3 +24,4 @@ void str_free(Str*s);
 void str_grow(Str*s,size_t n);
 void str_print(Str*s);
 void str_tr(Str*s,char a,char b);
+void str_randomize(Str*s);

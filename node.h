@@ -2,11 +2,12 @@
 
 #include<stdio.h>
 #include<stdlib.h>
-#include<stdbool.h>
-#include<stdint.h>
-#include"lex.h"
-#include"tok.h"
 #include"str.h"
+#include"vec.h"
+
+//#define vec_pushn(v,n) do{Node x=n;vec_push(v,&x);}while(0)
+
+enum PARTYPE {STATEMENT, EXPRESSION, ASSIGNMENT, IFSTATEMENT};
 
 /******
  * Grammar:
@@ -21,11 +22,13 @@
  * ARGLIST:		TYPENAME IDENTIFIER
  * 				|TYPENAME IDENTIFIER ',' ARGLIST
  ******/
-enum PARTYPE {STATEMENT, EXPRESSION};
-
-typedef struct Par
+typedef struct Node
 {
-	uint32_t mode;
-} Par;
+	Vec tokens;
+	Vec nodes;
+} Node;
 
-void par_tokens(Par*p,Lexer*l);
+Node node_new(void);
+Node*node_pushnode(Node*n);
+void node_free(Node*n);
+void node_print(Node*n,int lvl);

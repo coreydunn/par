@@ -5,7 +5,9 @@ OBJS=     p
 all: $(OBJS)
 %.o: %.c %.h
 	$(CC) $< -c $(CFLAGS)
-p: main.o lex.o vec.o str.o par.o
+test: test.o lex.o vec.o str.o tok.o
+	$(CC) $^ -o $@ $(LDFLAGS)
+p: main.o lex.o vec.o str.o tok.o node.o
 	$(CC) $^ -o $@ $(LDFLAGS)
 clean:
 	$(RM) *.o $(OBJS)

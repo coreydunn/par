@@ -52,7 +52,7 @@ void str_assign(Str*s,char*c)
 
 void str_print(Str*s)
 {
-	printf("%p: (%lu/%lu) '%s'\n",&s,s->size,s->capacity,s->buffer);
+	printf("%p: (%lu/%lu) '%s'\n",s,s->size,s->capacity,s->buffer);
 }
 
 void str_append(Str*s,char*c)
@@ -83,4 +83,31 @@ void str_clear(Str*s)
 	s->size=0;
 	if(s->buffer)
 		s->buffer[0]='\0';
+}
+
+Str str_newa(char*c)
+{
+	Str n=str_new();
+
+	if(c)
+		str_assign(&n,c);
+
+	return n;
+}
+
+void str_randomize(Str*s)
+{
+	size_t length=rand()%8+1;
+	bool vowell=false;
+	char*v="aeiou";
+	char*c="bcdfghjklmnpqrstvwxyz";
+	size_t i=0;
+
+	str_assign(s,"........\0");
+	for(;i<length;++i)
+	{
+		s->buffer[i]=(vowell)?(v[rand()%5]):(c[rand()%21]);
+		vowell=!vowell;
+	}
+	s->buffer[i]='\0';
 }
