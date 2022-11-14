@@ -4,10 +4,11 @@
 #include<stdlib.h>
 #include"str.h"
 #include"vec.h"
+#include"tok.h"
 
 //#define vec_pushn(v,n) do{PNode x=n;vec_push(v,&x);}while(0)
 
-enum PARTYPE {STATEMENT, EXPRESSION, ASSIGNMENT, IFSTATEMENT};
+enum PARTYPE {STATEMENT, EXPRESSION, ASSIGNMENT, IFSTATEMENT, DECLARATION, COMMENT, CODEBLOCK};
 
 /******
  * Grammar:
@@ -24,6 +25,7 @@ enum PARTYPE {STATEMENT, EXPRESSION, ASSIGNMENT, IFSTATEMENT};
  ******/
 typedef struct PNode
 {
+	struct PNode*parentnode;
 	Vec tokens;
 	Vec pnodes;
 	uint32_t type;
@@ -37,5 +39,7 @@ typedef struct Parser
 
 PNode pnode_new(void);
 PNode*pnode_pushnode(PNode*n);
+Parser parser_new(void);
+void parser_tokens(Parser*p,Vec*t);
 void pnode_free(PNode*n);
 void pnode_print(PNode*n,int lvl);

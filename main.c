@@ -9,7 +9,7 @@
 
 int main(int argc,char**argv)
 {
-	PNode root=pnode_new();
+	Parser parser=parser_new();
 	Str string=str_new();
 	Lexer lexer=lex_new();
 
@@ -19,9 +19,6 @@ int main(int argc,char**argv)
 		//str_assign(&string,"while(true)\n{\nx=253;\ny=\"string\";\n}");
 	else
 		str_assign(&string,argv[1]);
-
-	for(size_t i=0;i<lexer.tokens.size;++i)
-		printf("[%lu] type: %u\n",i,((Tok*)vec_at(&lexer.tokens,i))->type);
 
 	// LEX -----
 	// Identify lexemes in string
@@ -35,18 +32,16 @@ int main(int argc,char**argv)
 
 	// PARSE -----
 	// Create Parsing tree
-	pnode_pushnode(&root);
-	pnode_pushnode(&root);
-	pnode_pushnode(&root);
+	parser_tokens(&parser,&lexer.tokens);
 
 	// Copy tokens
 	for(size_t i=0;i<lexer.tokens.size;++i)
-		vec_pushta(&root.tokens,(((Tok*)lexer.tokens.buffer)[i].str.buffer));
+		vec_pushta(&parser.root.tokens,(((Tok*)lexer.tokens.buffer)[i].str.buffer));
 
-	pnode_print(&root,0);
-	pnode_free(&root);
-	pnode_print(&root,0);
+	pnode_print(&parser.root,0);
 
+	// Free memory and leave
+	pnode_free(&parser.root);
 	lex_free(&lexer);
 	str_free(&string);
 }

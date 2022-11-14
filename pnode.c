@@ -5,11 +5,21 @@
 #include"pnode.h"
 #include"tok.h"
 
+Parser parser_new(void)
+{
+	Parser p={
+		.root=pnode_new(),
+		.mode=0,
+	};
+	return p;
+}
+
 PNode pnode_new(void)
 {
 	PNode n={
 		.pnodes=vec_new(sizeof(PNode)), // Empty Vec
 		.tokens=vec_new(sizeof(Tok)), // Empty Vec
+		.parentnode=NULL,
 	};
 
 	return n;
@@ -67,4 +77,14 @@ void pnode_print(PNode*n,int lvl)
 		for(size_t i=0;i<n->pnodes.size;++i)
 			pnode_print(((PNode*)n->pnodes.buffer)+i,lvl);
 	}
+}
+
+// Parse Vec of Tok
+void parser_tokens(Parser*p,Vec*t)
+{
+	if(!p)return;
+	if(!t)return;
+	pnode_pushnode(&p->root);
+	pnode_pushnode(&p->root);
+	pnode_pushnode(&p->root);
 }
