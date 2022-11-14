@@ -8,11 +8,10 @@
 Node node_new(void)
 {
 	Node n={
-		.str=str_new(),
 		.nodes=vec_new(sizeof(Node)), // Empty Vec
+		.tokens=vec_new(sizeof(Tok)), // Empty Vec
 	};
 
-	str_randomize(&n.str);
 	return n;
 }
 
@@ -23,9 +22,6 @@ void node_free(Node*n)
 	for(size_t i=0;i<n->nodes.size;++i)
 		node_free(((Node*)n->nodes.buffer)+i);
 
-	if(n->str.buffer)
-		str_free(&n->str);
-
 	if(n->nodes.buffer)
 		vec_free(&n->nodes);
 
@@ -33,34 +29,34 @@ void node_free(Node*n)
 		vec_free(&n->tokens);
 }
 
-void node_pushnode(Node*n)
+Node*node_pushnode(Node*n)
 {
 	Node t=node_new();
-	if(!n)return;
+	if(!n)return NULL;
 
 	vec_push(&n->nodes,&t);
+	return &((Node*)n->nodes.buffer)[n->nodes.size-1];
 }
 
 void node_print(Node*n,int lvl)
 {
 	for(size_t i=0;i<lvl;++i)
 		printf("    ");
-	printf("%p: (c:%lu/%lu) (t:%lu/%lu) s:'%s'",
+	printf("%p: (c:%lu/%lu) (t: %lu/%lu)",
 			n,
 			n->nodes.size,
 			n->nodes.capacity,
 			n->tokens.size,
-			n->tokens.capacity,
-			n->str.buffer
+			n->tokens.capacity
 		  );
 
 	// Print tokens
-	printf(" tokens: [");
+	printf(" [");
 	for(size_t i=0;i<n->tokens.size;++i)
 	{
-		for(size_t j=0;j<lvl;++j)
-			printf("    ");
-		printf("'%s'\n",((Tok*)n->tokens.buffer)[i].str.buffer);
+		printf("'%s'",((Tok*)n->tokens.buffer)[i].str.buffer);
+		if(i<n->tokens.size-1)
+			printf(", ");
 	}
 	printf("]\n");
 
@@ -70,6 +66,5 @@ void node_print(Node*n,int lvl)
 	{
 		for(size_t i=0;i<n->nodes.size;++i)
 			node_print(((Node*)n->nodes.buffer)+i,lvl);
-			//printf("	%p\n",&((Node*)n->nodes.buffer)[i]);
 	}
 }
