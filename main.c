@@ -5,16 +5,17 @@
 #include"vec.h"
 #include"lex.h"
 #include"str.h"
-#include"node.h"
+#include"pnode.h"
 
 int main(int argc,char**argv)
 {
+	PNode root=pnode_new();
 	Str string=str_new();
 	Lexer lexer=lex_new();
 
 	// Determine string to lex/parse
 	if(argc<2)
-		str_assign(&string,"name=\"sandwiches or what\";");
+		str_assign(&string,"name=\"sam\"; x=3; number=77*x;");
 		//str_assign(&string,"while(true)\n{\nx=253;\ny=\"string\";\n}");
 	else
 		str_assign(&string,argv[1]);
@@ -22,7 +23,7 @@ int main(int argc,char**argv)
 	for(size_t i=0;i<lexer.tokens.size;++i)
 		printf("[%lu] type: %u\n",i,((Tok*)vec_at(&lexer.tokens,i))->type);
 
-	// LEX
+	// LEX -----
 	// Identify lexemes in string
 	lex_string(&lexer,string.buffer);
 
@@ -32,24 +33,19 @@ int main(int argc,char**argv)
 	printf("tokens: ");
 	lex_print(&lexer);
 
-	// PARSE
-	printf("~~~~~~ Test Node\n");
-	{
-		// Create Parsing tree
-		Node root=node_new();
-		node_pushnode(&root);
-		node_pushnode(&root);
-		node_pushnode(&root);
+	// PARSE -----
+	// Create Parsing tree
+	pnode_pushnode(&root);
+	pnode_pushnode(&root);
+	pnode_pushnode(&root);
 
-		// Copy tokens
-		for(size_t i=0;i<lexer.tokens.size;++i)
-			vec_pushta(&root.tokens,(((Tok*)lexer.tokens.buffer)[i].str.buffer));
+	// Copy tokens
+	for(size_t i=0;i<lexer.tokens.size;++i)
+		vec_pushta(&root.tokens,(((Tok*)lexer.tokens.buffer)[i].str.buffer));
 
-		node_print(&root,0);
-		node_free(&root);
-		node_print(&root,0);
-	}
-	printf("~~~~~~\n");
+	pnode_print(&root,0);
+	pnode_free(&root);
+	pnode_print(&root,0);
 
 	lex_free(&lexer);
 	str_free(&string);

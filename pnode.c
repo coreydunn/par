@@ -2,50 +2,50 @@
 #include<stdlib.h>
 #include"str.h"
 #include"vec.h"
-#include"node.h"
+#include"pnode.h"
 #include"tok.h"
 
-Node node_new(void)
+PNode pnode_new(void)
 {
-	Node n={
-		.nodes=vec_new(sizeof(Node)), // Empty Vec
+	PNode n={
+		.pnodes=vec_new(sizeof(PNode)), // Empty Vec
 		.tokens=vec_new(sizeof(Tok)), // Empty Vec
 	};
 
 	return n;
 }
 
-void node_free(Node*n)
+void pnode_free(PNode*n)
 {
 	if(!n)return;
 
-	for(size_t i=0;i<n->nodes.size;++i)
-		node_free(((Node*)n->nodes.buffer)+i);
+	for(size_t i=0;i<n->pnodes.size;++i)
+		pnode_free(((PNode*)n->pnodes.buffer)+i);
 
-	if(n->nodes.buffer)
-		vec_free(&n->nodes);
+	if(n->pnodes.buffer)
+		vec_free(&n->pnodes);
 
 	if(n->tokens.buffer)
 		vec_free(&n->tokens);
 }
 
-Node*node_pushnode(Node*n)
+PNode*pnode_pushnode(PNode*n)
 {
-	Node t=node_new();
+	PNode t=pnode_new();
 	if(!n)return NULL;
 
-	vec_push(&n->nodes,&t);
-	return &((Node*)n->nodes.buffer)[n->nodes.size-1];
+	vec_push(&n->pnodes,&t);
+	return &((PNode*)n->pnodes.buffer)[n->pnodes.size-1];
 }
 
-void node_print(Node*n,int lvl)
+void pnode_print(PNode*n,int lvl)
 {
 	for(size_t i=0;i<lvl;++i)
 		printf("    ");
 	printf("%p: (c:%lu/%lu) (t: %lu/%lu)",
 			n,
-			n->nodes.size,
-			n->nodes.capacity,
+			n->pnodes.size,
+			n->pnodes.capacity,
 			n->tokens.size,
 			n->tokens.capacity
 		  );
@@ -62,9 +62,9 @@ void node_print(Node*n,int lvl)
 
 	++lvl;
 
-	if(n->nodes.size>0)
+	if(n->pnodes.size>0)
 	{
-		for(size_t i=0;i<n->nodes.size;++i)
-			node_print(((Node*)n->nodes.buffer)+i,lvl);
+		for(size_t i=0;i<n->pnodes.size;++i)
+			pnode_print(((PNode*)n->pnodes.buffer)+i,lvl);
 	}
 }

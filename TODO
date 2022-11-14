@@ -17,5 +17,5 @@ Lexer
 Parser
 
 * Find patterns of lexemes [DONE]
+* Store parse data in grammar tree [DONE]
 * Define grammatical structures
-* ! Store parse data in grammar tree

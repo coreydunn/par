@@ -1,13 +1,11 @@
 CFLAGS=   -Wfatal-errors -Wall
 LDFLAGS=  -s
-OBJS=     p
+OBJS=     str.o tok.o vec.o lex.o pnode.o
 
-all: $(OBJS)
+all: p
 %.o: %.c %.h
 	$(CC) $< -c $(CFLAGS)
-test: test.o lex.o vec.o str.o tok.o
-	$(CC) $^ -o $@ $(LDFLAGS)
-p: main.o lex.o vec.o str.o tok.o node.o
+p: main.o $(OBJS)
 	$(CC) $^ -o $@ $(LDFLAGS)
 clean:
 	$(RM) *.o $(OBJS)

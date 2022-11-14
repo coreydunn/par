@@ -5,7 +5,7 @@
 #include"str.h"
 #include"vec.h"
 
-//#define vec_pushn(v,n) do{Node x=n;vec_push(v,&x);}while(0)
+//#define vec_pushn(v,n) do{PNode x=n;vec_push(v,&x);}while(0)
 
 enum PARTYPE {STATEMENT, EXPRESSION, ASSIGNMENT, IFSTATEMENT};
 
@@ -22,13 +22,20 @@ enum PARTYPE {STATEMENT, EXPRESSION, ASSIGNMENT, IFSTATEMENT};
  * ARGLIST:		TYPENAME IDENTIFIER
  * 				|TYPENAME IDENTIFIER ',' ARGLIST
  ******/
-typedef struct Node
+typedef struct PNode
 {
 	Vec tokens;
-	Vec nodes;
-} Node;
+	Vec pnodes;
+	uint32_t type;
+} PNode;
 
-Node node_new(void);
-Node*node_pushnode(Node*n);
-void node_free(Node*n);
-void node_print(Node*n,int lvl);
+typedef struct Parser
+{
+	PNode root;
+	uint32_t mode;
+} Parser;
+
+PNode pnode_new(void);
+PNode*pnode_pushnode(PNode*n);
+void pnode_free(PNode*n);
+void pnode_print(PNode*n,int lvl);
