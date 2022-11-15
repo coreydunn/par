@@ -6,6 +6,7 @@
 #include<ctype.h>
 #include"lex.h"
 #include"str.h"
+#include"reg.h"
 
 Lexer lex_new(void)
 {
@@ -28,6 +29,7 @@ void lex_free(Lexer*l)
 // Read string and store tokens
 void lex_string(Lexer*l,char*s)
 {
+	Reg regex=reg_new();
 	Str tmp=str_new();
 	char t[2]={0};
 	size_t strl;
@@ -150,6 +152,7 @@ void lex_string(Lexer*l,char*s)
 	}
 
 	str_free(&tmp);
+	reg_free(&regex);
 }
 
 void lex_print(Lexer*l)

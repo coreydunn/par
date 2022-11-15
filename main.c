@@ -2,10 +2,11 @@
 #include<stdlib.h>
 #include<unistd.h>
 #include<fcntl.h>
-#include"vec.h"
 #include"lex.h"
-#include"str.h"
 #include"pnode.h"
+#include"reg.h"
+#include"str.h"
+#include"vec.h"
 
 int main(int argc,char**argv)
 {
