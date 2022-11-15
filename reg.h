@@ -21,3 +21,4 @@ typedef struct Reg
 Reg reg_new(void);
 void reg_free(Reg*r);
 void reg_match(Reg*r,char*p,char*s);
+void reg_print(Reg*r);
