@@ -79,14 +79,18 @@ void reg_match2(Reg*r,char*p,char*s)
 				}
 
 				else
-					vec_pop(&r->matches);
+				{
+					if(found)
+						vec_pop(&r->matches);
+				}
 			}
 
 			// Alphabetical
 			else if(p[pat_idx]=='c')
 			{
 
-				if(isalpha(s[string_idx]))
+				//if(isalpha(s[string_idx]))
+				if((s[string_idx]>='a'&&s[string_idx]<='z')||(s[string_idx]>='A'&&s[string_idx]<='Z'))
 				{
 					if(!found)
 					{
@@ -123,6 +127,7 @@ void reg_match2(Reg*r,char*p,char*s)
 		++string_idx;
 	}
 	//puts("done");
+	//reg_match2(r,p,s+1);
 }
 
 void reg_print(Reg*r)
