@@ -58,10 +58,11 @@ void reg_match2(Reg*r,char*p,char*s)
 			//puts("magic");
 			++pat_idx;
 
+			printf("comparing '\\%c' with %c'\n",p[pat_idx],s[string_idx]);
 			// Digit
 			if(p[pat_idx]=='d' )
 			{
-				if(isdigit(s[string_idx]))
+				if(isdigit(s[string_idx])&&s[string_idx+1])
 				{
 					if(!found)
 					{
@@ -81,7 +82,12 @@ void reg_match2(Reg*r,char*p,char*s)
 				else
 				{
 					if(found)
+					{
 						vec_pop(&r->matches);
+						found=false;
+					}
+					else
+						done=true;
 				}
 			}
 
@@ -90,7 +96,7 @@ void reg_match2(Reg*r,char*p,char*s)
 			{
 
 				//if(isalpha(s[string_idx]))
-				if((s[string_idx]>='a'&&s[string_idx]<='z')||(s[string_idx]>='A'&&s[string_idx]<='Z'))
+				if(((s[string_idx]>='a'&&s[string_idx]<='z')||(s[string_idx]>='A'&&s[string_idx]<='Z'))&&s[string_idx+1])
 				{
 					if(!found)
 					{
@@ -110,7 +116,12 @@ void reg_match2(Reg*r,char*p,char*s)
 				else
 				{
 					if(found)
+					{
 						vec_pop(&r->matches);
+						found=false;
+					}
+					else
+						done=true;
 				}
 			}
 		}
@@ -121,6 +132,16 @@ void reg_match2(Reg*r,char*p,char*s)
 			if(s[string_idx]==p[pat_idx])
 				((Match*)r->matches.buffer)[r->matches.size-1]
 					.length++;
+			else
+			{
+				if(found)
+				{
+					vec_pop(&r->matches);
+					found=false;
+				}
+				else
+					done=true;
+			}
 		}
 
 		++pat_idx;
