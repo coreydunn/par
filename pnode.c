@@ -89,7 +89,8 @@ void parser_tokens(Parser*p,Vec*t)
 	if(!p)return;
 	if(!t)return;
 
-	PNode*current_node=&p->root;
+	// Do not push tokens to root node
+	PNode*current_node=pnode_pushnode(&p->root);
 
 	// Copy tokens
 	for(size_t i=0;i<t->size;++i)
