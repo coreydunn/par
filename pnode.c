@@ -48,7 +48,7 @@ PNode*pnode_pushnode(PNode*n)
 	return &((PNode*)n->pnodes.buffer)[n->pnodes.size-1];
 }
 
-void pnode_print(PNode*n,int lvl)
+void pnode_print(PNode*n,size_t lvl)
 {
 	for(size_t i=0;i<lvl;++i)
 		printf("    ");
@@ -85,13 +85,18 @@ void parser_tokens(Parser*p,Vec*t)
 	if(!p)return;
 	if(!t)return;
 
-	pnode_pushnode(&p->root);
-	pnode_pushnode(&p->root);
-	pnode_pushnode(&p->root);
+	// Create child nodes
+	//pnode_pushnode(&p->root);
+	//pnode_pushnode(&p->root);
+	//pnode_pushnode(&p->root);
 
 	// Copy tokens
 	for(size_t i=0;i<t->size;++i)
-		vec_pushta(&p->root.tokens,(((Tok*)t->buffer)[i].str.buffer));
+	{
+		Tok*tok=&((Tok*)t->buffer)[i];
+		if(tok->type!=LCOMMENT)
+			vec_pushta(&p->root.tokens,tok->str.buffer);
 		//vec_pushta(&parser.root.tokens,(((Tok*)lexer.tokens.buffer)[i].str.buffer));
+	}
 
 }

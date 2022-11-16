@@ -42,4 +42,4 @@ PNode*pnode_pushnode(PNode*n);
 Parser parser_new(void);
 void parser_tokens(Parser*p,Vec*t);
 void pnode_free(PNode*n);
-void pnode_print(PNode*n,int lvl);
+void pnode_print(PNode*n,size_t lvl);
