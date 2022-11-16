@@ -54,7 +54,7 @@ void pnode_print(PNode*n,size_t lvl)
 {
 	for(size_t i=0;i<lvl;++i)
 		printf("    ");
-	printf("%p: (c:%lu/%lu) (t: %lu/%lu)",
+	printf("%p: (c:%lu/%lu) (t:%lu/%lu)",
 			n,
 			n->pnodes.size,
 			n->pnodes.capacity,

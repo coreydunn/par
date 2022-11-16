@@ -72,6 +72,11 @@ void lex_string(Lexer*l,char*s)
 				initmatch("#",LCOMMENT,true)
 				break;
 
+				/****
+				 * TODO: something is wrong with modematch
+				 * which puts garbage chars at the beginning
+				 * of tmp
+				 ****/
 			// Individual modes
 			case IDENTIFIER:modematch("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789",false,true);
 							for(size_t j=0;j<sizeof(keywords)/sizeof(char*);++j)

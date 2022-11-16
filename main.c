@@ -13,33 +13,42 @@ int main(int argc,char**argv)
 	Parser parser=parser_new();
 	Str string=str_new();
 	Lexer lexer=lex_new();
+	FILE*infile=stdin;
 
 	// Determine string to lex/parse
-	if(argc<2)
-		str_assign(&string,"name=\"sam\"; x=3; number=77*x;");
-		//str_assign(&string,"while(true)\n{\nx=253;\ny=\"string\";\n}");
-	else
-		str_assign(&string,argv[1]);
+	if(argc>1)
+	{
+		infile=fopen(argv[1],"r");
+		if(!infile)
+			fprintf(stderr,"error: failed to open infile '%s'\n",argv[1]);
+	}
 
-	// LEX -----
-	// Identify lexemes in string
-	lex_string(&lexer,string.buffer);
+	// Read input file into buffer
+	if(infile)
+	{
+		char buffer[1024]={0};
+		size_t count=0;
 
-	// Print results
-	//printf("lex_string: ");
-	//str_print(&string);
-	//printf("tokens: ");
-	//lex_print(&lexer);
+		count=fread(buffer,1,1000,infile);
+		buffer[count]=0;
+		str_append(&string,buffer);
 
-	// PARSE -----
-	// Create Parsing tree
-	parser_tokens(&parser,&lexer.tokens);
+		fclose(infile);
+	}
 
-	lex_free(&lexer);
 
-	pnode_print(&parser.root,0);
+	// Lex --> Parse --> Print
+	if(string.buffer)
+	{
+		lex_string(&lexer,string.buffer);
+		str_free(&string);
+		parser_tokens(&parser,&lexer.tokens);
+		lex_free(&lexer);
+		pnode_print(&parser.root,0);
+	}
 
 	// Free memory and leave
+	lex_free(&lexer);
 	pnode_free(&parser.root);
 	//lex_free(&lexer);
 	str_free(&string);
