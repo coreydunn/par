@@ -1,4 +1,4 @@
-CFLAGS=   -Wfatal-errors -Wall
+CFLAGS=   -Wfatal-errors -Wall -Wextra
 LDFLAGS=  -s
 OBJS=     str.o tok.o vec.o lex.o pnode.o reg.o
 
