@@ -10,6 +10,8 @@
 
 enum PARTYPE {STATEMENT, EXPRESSION, ASSIGNMENT, IFSTATEMENT, DECLARATION, COMMENT, CODEBLOCK};
 
+extern char*partype_names[];
+
 /******
  * Grammar:
  * STATEMENT:	EXPRESSION ';'

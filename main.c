@@ -26,10 +26,10 @@ int main(int argc,char**argv)
 	lex_string(&lexer,string.buffer);
 
 	// Print results
-	printf("lex_string: ");
-	str_print(&string);
-	printf("tokens: ");
-	lex_print(&lexer);
+	//printf("lex_string: ");
+	//str_print(&string);
+	//printf("tokens: ");
+	//lex_print(&lexer);
 
 	// PARSE -----
 	// Create Parsing tree

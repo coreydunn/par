@@ -5,6 +5,8 @@
 #include"pnode.h"
 #include"tok.h"
 
+char*partype_names[]={"STATEMENT","EXPRESSION","ASSIGNMENT","IFSTATEMENT","DECLARATION","COMMENT","CODEBLOCK"};
+
 Parser parser_new(void)
 {
 	Parser p={
@@ -68,7 +70,9 @@ void pnode_print(PNode*n,size_t lvl)
 		if(i<n->tokens.size-1)
 			printf(", ");
 	}
-	printf("]\n");
+	printf("]");
+
+	printf(" %s\n",partype_names[n->type]);
 
 	++lvl;
 
@@ -85,17 +89,33 @@ void parser_tokens(Parser*p,Vec*t)
 	if(!p)return;
 	if(!t)return;
 
-	// Create child nodes
-	//pnode_pushnode(&p->root);
-	//pnode_pushnode(&p->root);
-	//pnode_pushnode(&p->root);
+	PNode*current_node=&p->root;
 
 	// Copy tokens
 	for(size_t i=0;i<t->size;++i)
 	{
 		Tok*tok=&((Tok*)t->buffer)[i];
-		if(tok->type!=LCOMMENT)
-			vec_pushta(&p->root.tokens,tok->str.buffer);
+
+		//current_node->type=STATEMENT;
+
+		if(tok->type==OPERATOR && tok->str.buffer[0]==';')
+		{
+			//current_node->type=STATEMENT;
+			vec_pushta(&current_node->tokens,tok->str.buffer);
+			if(i<t->size-1)
+				current_node=pnode_pushnode(&p->root);
+		}
+
+		else if(tok->type==LCOMMENT && tok->str.buffer[0]=='#')
+		{
+			current_node->type=COMMENT;
+			vec_pushta(&current_node->tokens,tok->str.buffer);
+			if(i<t->size-1)
+				current_node=pnode_pushnode(&p->root);
+		}
+
+		else
+			vec_pushta(&current_node->tokens,tok->str.buffer);
 		//vec_pushta(&parser.root.tokens,(((Tok*)lexer.tokens.buffer)[i].str.buffer));
 	}
 
