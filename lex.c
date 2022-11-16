@@ -50,9 +50,8 @@ void lex_string(Lexer*l,char*s)
 	for(size_t i=0;i<strl;++i)
 	{
 
-#define match(set,x,stripchar) if(s[i]&&memchr((set),s[i],strlen((set)))){l->mode=(x);if(stripchar)--i;vec_pushl(&l->tokens,((Tok){.str=str_new(),.type=l->mode}));str_clear(&tmp);}
-#define modematch(set,logic,stripchar) do{if(!s[i]||(logic==(!!memchr((set),s[i],strlen(set)))) ){l->mode=NONE;if(stripchar)--i;str_assign(&((Tok*)l->tokens.buffer)[l->tokens.size-1].str,tmp.buffer);}}while(0)
-#define finish() do{t[0]=s[i];str_append(&tmp,t);}while(0)
+#define initmatch(set,x,stripchar) if(s[i]&&memchr((set),s[i],strlen((set)))){l->mode=(x);if(stripchar)--i;vec_pushl(&l->tokens,((Tok){.str=str_new(),.type=l->mode}));str_clear(&tmp);}
+#define modematch(set,logic,stripchar) do{if(!s[i]||(logic==(!!memchr((set),s[i],strlen(set)))) ){l->mode=NONE;if(stripchar)--i;str_assign(&((Tok*)l->tokens.buffer)[l->tokens.size-1].str,tmp.buffer);}t[0]=s[i];str_append(&tmp,t);}while(0)
 		switch(l->mode)
 		{
 
@@ -66,26 +65,27 @@ void lex_string(Lexer*l,char*s)
 			 *****/
 			case NONE:
 			default:
-				match("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_",IDENTIFIER,true) else
-				match("\"",STRING,false) else
-				match("0123456789",INTEGER,true) else
-				match(operators,OPERATOR,true)
+				initmatch("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_",IDENTIFIER,true) else
+				initmatch("\"",STRING,false) else
+				initmatch("0123456789",INTEGER,true) else
+				initmatch(operators,OPERATOR,true) else
+				initmatch("#",LCOMMENT,true)
 				break;
 
 			// Individual modes
-			case IDENTIFIER:modematch("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789",false,true);finish();
+			case IDENTIFIER:modematch("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789",false,true);
 							for(size_t j=0;j<sizeof(keywords)/sizeof(char*);++j)
 								if(strcmp(keywords[j],tmp.buffer)==0)
 									((Tok*)l->tokens.buffer)[l->tokens.size-1].type=KEYWORD;
 							break;
-			case INTEGER:modematch("0123456789",false,true);finish();break;
-			case STRING:modematch("\"",true,false);finish();break;
-			case OPERATOR:modematch(operators,false,true);finish();break;
+			case INTEGER:modematch("0123456789",false,true);break;
+			case STRING:modematch("\"",true,false);break;
+			case OPERATOR:modematch(operators,false,true);break;
+			case LCOMMENT:modematch("\n",true,true);break;
 
 		}
-#undef match
+#undef initmatch
 #undef modematch
-#undef finish
 	}
 
 	str_free(&tmp);
