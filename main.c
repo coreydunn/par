@@ -1,55 +1,72 @@
+#include<fcntl.h>
+#include<signal.h>
 #include<stdio.h>
 #include<stdlib.h>
 #include<unistd.h>
-#include<fcntl.h>
-#include"lex.h"
-#include"pnode.h"
-#include"reg.h"
-#include"str.h"
-#include"vec.h"
+#include"par.h"
+
+static State par;
 
 int main(int argc,char**argv)
 {
-	Parser parser=parser_new();
-	Str string=str_new();
-	Lexer lexer=lex_new();
-	FILE*infile=stdin;
+	par=(State){
+		.parser=parser_new(),
+		.string=str_new(),
+		.lexer=lex_new(),
+		.infile=stdin,
+	};
+
+	// Ensure cleanup is called
+	signal(SIGINT,sighandle);
 
 	// Determine string to lex/parse
 	if(argc>1)
 	{
-		infile=fopen(argv[1],"r");
-		if(!infile)
+		par.infile=fopen(argv[1],"r");
+		if(!par.infile)
 			fprintf(stderr,"error: failed to open infile '%s'\n",argv[1]);
 	}
 
 	// Read input file into buffer
-	if(infile)
+	if(par.infile)
 	{
 		char buffer[1024]={0};
 		size_t count=0;
 
-		count=fread(buffer,1,1000,infile);
+		count=fread(buffer,1,1000,par.infile);
 		buffer[count]=0;
-		str_append(&string,buffer);
+		str_append(&par.string,buffer);
 
-		fclose(infile);
+		fclose(par.infile);
 	}
 
-
 	// Lex --> Parse --> Print
-	if(string.buffer)
+	if(par.string.buffer)
 	{
-		lex_string(&lexer,string.buffer);
-		str_free(&string);
-		parser_tokens(&parser,&lexer.tokens);
-		lex_free(&lexer);
-		pnode_print(&parser.root,0);
+		lex_string(&par.lexer,par.string.buffer);
+		str_free(&par.string);
+		parser_tokens(&par.parser,&par.lexer.tokens);
+		lex_free(&par.lexer);
+		pnode_print(&par.parser.root,0);
 	}
 
 	// Free memory and leave
-	lex_free(&lexer);
-	pnode_free(&parser.root);
-	//lex_free(&lexer);
-	str_free(&string);
+	cleanup();
+}
+
+void cleanup(void)
+{
+	puts("bye");
+	lex_free(&par.lexer);
+	pnode_free(&par.parser.root);
+	str_free(&par.string);
+}
+
+void sighandle(int sig)
+{
+	if(sig==SIGINT)
+	{
+		cleanup();
+		exit(0);
+	}
 }
