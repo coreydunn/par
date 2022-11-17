@@ -35,7 +35,7 @@ void lex_string(Lexer*l,char*s)
 	size_t strl;
 	char*operators="-+*/=;(),";
 	char*keywords[]={"for","while","do","true","false"};
-	size_t line=1;
+	size_t current_line=1;
 
 	if(!l||!s)return;
 
@@ -46,8 +46,8 @@ void lex_string(Lexer*l,char*s)
 	for(size_t i=0;i<strl;++i)
 	{
 
-#define initmatch(set,x,stripchar) if(s[i]&&memchr((set),s[i],strlen((set)))){l->mode=(x);if(stripchar)--i;vec_pushl(&l->tokens,((Tok){.str=str_new(),.type=l->mode,.line=line}));str_clear(&tmp);}
-#define modematch(set,logic,stripchar) do{if(!s[i]||(logic==(!!memchr((set),s[i],strlen(set)))) ){l->mode=NONE;if(stripchar)--i;str_assign(&((Tok*)l->tokens.buffer)[l->tokens.size-1].str,tmp.buffer);}t[0]=s[i];str_append(&tmp,t);}while(0)
+#define initmatch(set,x,stripchar) if(s[i]&&memchr((set),s[i],strlen((set)))){l->mode=(x);if(stripchar)--i;vec_pushl(&l->tokens,((Tok){.str=str_new(),.type=l->mode,.line=current_line}));str_clear(&tmp);}
+#define modematch(set,logic,stripchar) do{if(!s[i]||(logic==(!!memchr((set),s[i],strlen(set)))) ){l->mode=NONE;if(stripchar)--i;str_assign(&((Tok*)l->tokens.buffer)[l->tokens.size-1].str,tmp.buffer);((Tok*)l->tokens.buffer)[l->tokens.size-1].line=current_line;}t[0]=s[i];str_append(&tmp,t);}while(0)
 		switch(l->mode)
 		{
 
@@ -66,8 +66,8 @@ void lex_string(Lexer*l,char*s)
 				initmatch("0123456789",INTEGER,true) else
 				initmatch(operators,OPERATOR,true) else
 				initmatch("#",LCOMMENT,true) else
-				if(strchr(" \t\n",s[i])){if(s[i]=='\n')++line;continue;} else
-				fprintf(stderr,"error: %lu: unrecognized character '%c' (%x)\n",line,((s[i]>32)?(s[i]):(' ')),s[i]);
+				if(strchr(" \t\n",s[i])){if(s[i]=='\n')++current_line;continue;} else
+				fprintf(stderr,"error: %lu: unrecognized character '%c' (%x)\n",current_line,((s[i]>32)?(s[i]):(' ')),s[i]);
 				//initmatch(" \t\n",NONE,false)
 				break;
 

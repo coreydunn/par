@@ -54,12 +54,13 @@ void pnode_print(PNode*n,size_t lvl)
 {
 	for(size_t i=0;i<lvl;++i)
 		printf("    ");
-	printf("%p: (c:%lu/%lu) (t:%lu/%lu)",
+	printf("%p: (c:%lu/%lu) (t:%lu/%lu) %lu:",
 			n,
 			n->pnodes.size,
 			n->pnodes.capacity,
 			n->tokens.size,
-			n->tokens.capacity
+			n->tokens.capacity,
+			(n->tokens.size>0)?(((Tok*)n->tokens.buffer)[0].line):(0)
 		  );
 
 	// Print tokens
@@ -83,6 +84,27 @@ void pnode_print(PNode*n,size_t lvl)
 	}
 }
 
+void pnode_print_brief(PNode*n,size_t lvl)
+{
+	for(size_t i=0;i<lvl;++i)
+		printf("    ");
+
+	if(n->tokens.size>0)
+		printf("%lu: ",((Tok*)n->tokens.buffer)[0].line);
+	printf("%s: ",partype_names[n->type]);
+
+	// Print tokens
+	for(size_t i=0;i<n->tokens.size;++i)
+		printf("%s",((Tok*)n->tokens.buffer)[i].str.buffer);
+	printf("\n");
+
+	++lvl;
+
+	if(n->pnodes.size>0)
+		for(size_t i=0;i<n->pnodes.size;++i)
+			pnode_print_brief(((PNode*)n->pnodes.buffer)+i,lvl);
+}
+
 // Parse Vec of Tok
 void parser_tokens(Parser*p,Vec*t)
 {
@@ -103,6 +125,7 @@ void parser_tokens(Parser*p,Vec*t)
 		{
 			//current_node->type=STATEMENT;
 			vec_pushta(&current_node->tokens,tok->str.buffer);
+			((Tok*)current_node->tokens.buffer)[current_node->tokens.size-1].line = tok->line;
 			if(i<t->size-1)
 				current_node=pnode_pushnode(&p->root);
 		}
@@ -111,12 +134,16 @@ void parser_tokens(Parser*p,Vec*t)
 		{
 			current_node->type=COMMENT;
 			vec_pushta(&current_node->tokens,tok->str.buffer);
+			((Tok*)current_node->tokens.buffer)[current_node->tokens.size-1].line = tok->line;
 			if(i<t->size-1)
 				current_node=pnode_pushnode(&p->root);
 		}
 
 		else
+		{
 			vec_pushta(&current_node->tokens,tok->str.buffer);
+			((Tok*)current_node->tokens.buffer)[current_node->tokens.size-1].line = tok->line;
+		}
 		//vec_pushta(&parser.root.tokens,(((Tok*)lexer.tokens.buffer)[i].str.buffer));
 	}
 

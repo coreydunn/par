@@ -45,3 +45,4 @@ Parser parser_new(void);
 void parser_tokens(Parser*p,Vec*t);
 void pnode_free(PNode*n);
 void pnode_print(PNode*n,size_t lvl);
+void pnode_print_brief(PNode*n,size_t lvl);
