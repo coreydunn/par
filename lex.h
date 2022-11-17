@@ -12,7 +12,8 @@
 
 #define vec_pushl(v,l) do{Tok x=l;vec_push(v,&x);}while(0)
 
-enum LEXTYPE {NONE, IDENTIFIER, INTEGER, STRING, OPERATOR, KEYWORD, LCOMMENT};
+enum LEXTYPE {NONE, IDENTIFIER, INTEGER, FLOAT, STRING, OPERATOR, KEYWORD, LCOMMENT};
+extern char*lextype_names[];
 
 //typedef struct Tok
 //{

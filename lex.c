@@ -8,6 +8,8 @@
 #include"str.h"
 #include"reg.h"
 
+char*lextype_names[]={"NONE","IDENTIFIER","INTEGER","FLOAT","STRING","OPERATOR","KEYWORD","LCOMMENT"};
+
 Lexer lex_new(void)
 {
 	Lexer l={
@@ -82,7 +84,10 @@ void lex_string(Lexer*l,char*s)
 								if(strcmp(keywords[j],tmp.buffer)==0)
 									((Tok*)l->tokens.buffer)[l->tokens.size-1].type=KEYWORD;
 							break;
-			case INTEGER:modematch("0123456789",false,true);break;
+			case INTEGER:modematch("0123456789.",false,true);
+						 if(strchr(tmp.buffer,'.'))
+							 ((Tok*)l->tokens.buffer)[l->tokens.size-1].type=FLOAT;
+						 break;
 			case STRING:modematch("\"",true,false);break;
 			case OPERATOR:modematch(operators,false,true);break;
 			case LCOMMENT:modematch("\n",true,true);break;
@@ -101,8 +106,10 @@ void lex_print(Lexer*l)
 	printf("%p: [",l);
 	for(size_t i=0;i<l->tokens.size;++i)
 	{
-		printf("'%s'(%u)",
+		printf("'%s'(%s %u)",
+		//printf("'%s'(%s)",
 				((Tok*)l->tokens.buffer)[i].str.buffer,
+				lextype_names[((Tok*)l->tokens.buffer)[i].type],
 				((Tok*)l->tokens.buffer)[i].type
 				);
 		if(i<l->tokens.size-1)
