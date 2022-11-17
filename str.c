@@ -30,7 +30,11 @@ void str_grow(Str*s,size_t n)
 	if(!s)return;
 
 	if(!s->buffer)
+	{
 		s->buffer=malloc(n);
+		if(s->buffer)
+			s->buffer[0]=0;
+	}
 	else
 		s->buffer=realloc(s->buffer,s->capacity+n);
 
@@ -64,6 +68,8 @@ void str_append(Str*s,char*c)
 	n=strlen(c)+1;
 	if(s->capacity<s->size+n)
 		str_grow(s,s->size+n);
+	if(!s->buffer)
+		return;
 	strcat(s->buffer,c);
 	s->size+=n-1;
 
