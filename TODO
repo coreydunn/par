@@ -19,3 +19,4 @@ Parser
 * Find patterns of lexemes [DONE]
 * Store parse data in grammar tree [DONE]
 * Define grammatical structures
+	- Recursive statements (e.g., if, while...)
