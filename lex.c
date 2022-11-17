@@ -9,6 +9,8 @@
 #include"reg.h"
 
 char*lextype_names[]={"NONE","IDENTIFIER","INTEGER","FLOAT","STRING","OPERATOR","KEYWORD","LCOMMENT"};
+static char*operators="-+*/=;(),.";
+static char*keywords[]={"for","if","while","do","true","false"};
 
 Lexer lex_new(void)
 {
@@ -35,8 +37,6 @@ void lex_string(Lexer*l,char*s)
 	Str tmp=str_new();
 	char t[2]={0};
 	size_t strl;
-	char*operators="-+*/=;(),";
-	char*keywords[]={"for","if","while","do","true","false"};
 	size_t current_line=1;
 
 	if(!l||!s)return;
@@ -84,14 +84,20 @@ void lex_string(Lexer*l,char*s)
 								if(strcmp(keywords[j],tmp.buffer)==0)
 									((Tok*)l->tokens.buffer)[l->tokens.size-1].type=KEYWORD;
 							break;
+			case FLOAT:modematch("0123456789",false,true);break;
 			case INTEGER:modematch("0123456789.",false,true);
+						 if(s[i]=='.')
 						 {
-							 size_t n=lex_strchrcount(tmp.buffer,'.');
-							 if(n==1)
-								 ((Tok*)l->tokens.buffer)[l->tokens.size-1].type=FLOAT;
-							 else if(n>1)
-								 fprintf(stderr,"error: %lu: invalid float format '%s'\n",current_line,tmp.buffer);
+							 ((Tok*)l->tokens.buffer)[l->tokens.size-1].type=FLOAT;
+							 l->mode=FLOAT;
 						 }
+						 //{
+							 //size_t n=lex_strchrcount(tmp.buffer,'.');
+							 //if(n==1)
+								 //((Tok*)l->tokens.buffer)[l->tokens.size-1].type=FLOAT;
+							 //else if(n>1)
+								 //fprintf(stderr,"error: %lu: invalid float format '%s'\n",current_line,tmp.buffer);
+						 //}
 						 break;
 			case STRING:modematch("\"",true,false);break;
 			case OPERATOR:modematch(operators,false,true);break;

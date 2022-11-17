@@ -20,5 +20,5 @@ typedef struct State
 	FILE*infile;
 } State;
 
-void cleanup(void);
+void cleanquit(int exitval);
 void sighandle(int sig);

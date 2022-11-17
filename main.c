@@ -52,22 +52,20 @@ int main(int argc,char**argv)
 	}
 
 	// Free memory and leave
-	cleanup();
+	cleanquit(0);
 }
 
-void cleanup(void)
+void cleanquit(int exitval)
 {
 	puts("bye");
 	lex_free(&par.lexer);
 	pnode_free(&par.parser.root);
 	str_free(&par.input_buffer);
+	exit(exitval);
 }
 
 void sighandle(int sig)
 {
 	if(sig==SIGINT)
-	{
-		cleanup();
-		exit(0);
-	}
+		cleanquit(0);
 }
