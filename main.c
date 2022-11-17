@@ -11,7 +11,7 @@ int main(int argc,char**argv)
 {
 	par=(State){
 		.parser=parser_new(),
-		.string=str_new(),
+		.input_buffer=str_new(),
 		.lexer=lex_new(),
 		.infile=stdin,
 	};
@@ -30,21 +30,22 @@ int main(int argc,char**argv)
 	// Read input file into buffer
 	if(par.infile)
 	{
-		char buffer[1024]={0};
+		char file_buffer[1024]={0};
 		size_t count=0;
 
-		count=fread(buffer,1,1000,par.infile);
-		buffer[count]=0;
-		str_append(&par.string,buffer);
+		count=fread(file_buffer,1,1000,par.infile);
+		file_buffer[count]=0;
+		str_append(&par.input_buffer,file_buffer);
 
 		fclose(par.infile);
 	}
 
 	// Lex --> Parse --> Print
-	if(par.string.buffer)
+	if(par.input_buffer.buffer)
 	{
-		lex_string(&par.lexer,par.string.buffer);
-		str_free(&par.string);
+		lex_string(&par.lexer,par.input_buffer.buffer);
+		str_free(&par.input_buffer);
+		lex_print(&par.lexer);
 		parser_tokens(&par.parser,&par.lexer.tokens);
 		lex_free(&par.lexer);
 		pnode_print(&par.parser.root,0);
@@ -59,7 +60,7 @@ void cleanup(void)
 	puts("bye");
 	lex_free(&par.lexer);
 	pnode_free(&par.parser.root);
-	str_free(&par.string);
+	str_free(&par.input_buffer);
 }
 
 void sighandle(int sig)

@@ -16,7 +16,7 @@ typedef struct State
 {
 	Lexer lexer;
 	Parser parser;
-	Str string;
+	Str input_buffer;
 	FILE*infile;
 } State;
 

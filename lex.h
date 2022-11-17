@@ -28,6 +28,7 @@ typedef struct Lexer
 } Lexer;
 
 Lexer lex_new(void);
+size_t lex_strchrcount(char*str,char c);
 void lex_free(Lexer*l);
-void lex_string(Lexer*l,char*s);
 void lex_print(Lexer*l);
+void lex_string(Lexer*l,char*s);
