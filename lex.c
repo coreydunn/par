@@ -46,7 +46,7 @@ void lex_string(Lexer*l,char*s)
 	for(size_t i=0;i<strl;++i)
 	{
 
-#define initmatch(set,x,stripchar) if(s[i]&&memchr((set),s[i],strlen((set)))){l->mode=(x);if(stripchar)--i;vec_pushl(&l->tokens,((Tok){.str=str_new(),.type=l->mode}));str_clear(&tmp);}
+#define initmatch(set,x,stripchar) if(s[i]&&memchr((set),s[i],strlen((set)))){l->mode=(x);if(stripchar)--i;vec_pushl(&l->tokens,((Tok){.str=str_new(),.type=l->mode,.line=line}));str_clear(&tmp);}
 #define modematch(set,logic,stripchar) do{if(!s[i]||(logic==(!!memchr((set),s[i],strlen(set)))) ){l->mode=NONE;if(stripchar)--i;str_assign(&((Tok*)l->tokens.buffer)[l->tokens.size-1].str,tmp.buffer);}t[0]=s[i];str_append(&tmp,t);}while(0)
 		switch(l->mode)
 		{

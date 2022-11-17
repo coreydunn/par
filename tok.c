@@ -7,6 +7,7 @@ Tok tok_new(void)
 	Tok t={
 		.str=str_new(),
 		.type=0,
+		.line=1,
 	};
 
 	return t;

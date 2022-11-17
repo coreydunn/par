@@ -13,6 +13,7 @@ typedef struct Tok
 {
 	Str str;
 	uint32_t type;
+	size_t line;
 } Tok;
 
 void tok_free(Tok*t);
