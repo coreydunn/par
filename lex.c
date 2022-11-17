@@ -33,18 +33,14 @@ void lex_string(Lexer*l,char*s)
 	Str tmp=str_new();
 	char t[2]={0};
 	size_t strl;
-	char*operators="-+*/=;()";
+	char*operators="-+*/=;(),";
 	char*keywords[]={"for","while","do","true","false"};
+	size_t line=1;
 
 	if(!l||!s)return;
 
-	//vec_pushl(&l->tokens,((Tok){
-			//.str=str_new(),
-			//.type=NONE})
-			//);
-
 	strl=strlen(s);
-	if(strl>1)++strl;
+	//if(strl>1)++strl;
 
 	// Read each individual byte
 	for(size_t i=0;i<strl;++i)
@@ -69,7 +65,10 @@ void lex_string(Lexer*l,char*s)
 				initmatch("\"",STRING,false) else
 				initmatch("0123456789",INTEGER,true) else
 				initmatch(operators,OPERATOR,true) else
-				initmatch("#",LCOMMENT,true)
+				initmatch("#",LCOMMENT,true) else
+				if(strchr(" \t\n",s[i])){if(s[i]=='\n')++line;continue;} else
+				fprintf(stderr,"error: %lu: unrecognized character '%c' (%x)\n",line,((s[i]>32)?(s[i]):(' ')),s[i]);
+				//initmatch(" \t\n",NONE,false)
 				break;
 
 				/****
