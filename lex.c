@@ -49,20 +49,20 @@ void lex_string(Lexer*l,char*s)
 	{
 
 		/*****
-		 * initmatch(set,mode,stripchar)
-		 * set          char*     set of characters which s[i] must match
+		 * initmatch(chset,mode,keepch)
+		 * chset        char*     set of characters which s[i] must match
 		 * mode         uint32_t  change lexer mode to this
-		 * stripchar    bool      will we retain this character in the token string?
+		 * keepch    bool      will we retain this character in the token string?
 		 *****/
 #define initmatch(chset,lmode,keepch) if(s[i]&&memchr((chset),s[i],strlen((chset)))){l->mode=(lmode);if(keepch)--i;vec_pushl(&l->tokens,((Tok){.str=str_new(),.type=l->mode,.line=current_line}));str_clear(&tmpstr);}
 
 		/*****
-		 * modematch(chset,mode,keepch)
+		 * modematch(chset,logic,keepch)
 		 * chset        char*     set of characters which s[i] must match
-		 * mode         uint32_t  change lexer mode to this
+		 * logic        bool      if false, only modify current token when s[i] does NOT match chset
 		 * keepch       bool      will we retain this character in the token string?
 		 *****/
-#define modematch(set,logic,stripchar) do{if(!s[i]||(logic==(!!memchr((set),s[i],strlen(set)))) ){l->mode=NONE;if(stripchar)--i;str_assign(&((Tok*)l->tokens.buffer)[l->tokens.size-1].str,tmpstr.buffer);((Tok*)l->tokens.buffer)[l->tokens.size-1].line=current_line;}ch[0]=s[i];str_append(&tmpstr,ch);}while(0)
+#define modematch(chset,logic,keepch) do{if(!s[i]||(logic==(!!memchr((chset),s[i],strlen(chset)))) ){l->mode=NONE;if(keepch)--i;str_assign(&((Tok*)l->tokens.buffer)[l->tokens.size-1].str,tmpstr.buffer);((Tok*)l->tokens.buffer)[l->tokens.size-1].line=current_line;}ch[0]=s[i];str_append(&tmpstr,ch);}while(0)
 
 		switch(l->mode)
 		{

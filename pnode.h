@@ -8,7 +8,7 @@
 
 //#define vec_pushn(v,n) do{PNode x=n;vec_push(v,&x);}while(0)
 
-enum PARTYPE {STATEMENT, EXPRESSION, ASSIGNMENT, IFSTATEMENT, DECLARATION, COMMENT, CODEBLOCK};
+enum PARTYPE {EXPRESSION, STATEMENT, ASSIGNMENT, IFSTATEMENT, DECLARATION, COMMENT, CODEBLOCK};
 
 extern char*partype_names[];
 

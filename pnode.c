@@ -5,7 +5,7 @@
 #include"pnode.h"
 #include"tok.h"
 
-char*partype_names[]={"STATEMENT","EXPRESSION","ASSIGNMENT","IFSTATEMENT","DECLARATION","COMMENT","CODEBLOCK"};
+char*partype_names[]={"EXPRESSION","STATEMENT","ASSIGNMENT","IFSTATEMENT","DECLARATION","COMMENT","CODEBLOCK"};
 
 Parser parser_new(void)
 {
@@ -117,6 +117,7 @@ void parser_tokens(Parser*p,Vec*t)
 	// Copy tokens, create PNodes
 	for(size_t i=0;i<t->size;++i)
 	{
+
 		/*****
 		 * match(lex_type,lex_subtype,settype,newtype,endnode)
 		 * lex_type     uint32_t  token must match this
@@ -125,7 +126,7 @@ void parser_tokens(Parser*p,Vec*t)
 		 * newtype      uint32_t  change current_node type to this
 		 * endnode      bool      will we terminate current_node?
 		 *****/
-#define match(ty,subty,setty,newty,end) if(src->type==ty&&src->subtype==subty){if(setty)current_node->type=newty;if(end&&i<t->size-1)current_node=pnode_pushnode(&p->root);}
+#define match(lex_type,lex_subtype,settype,newtype,endnode) if(src->type==lex_type&&src->subtype==lex_subtype){if(settype)current_node->type=newtype;if(endnode&&i<t->size-1)current_node=pnode_pushnode(&p->root);}
 		Tok*src=&((Tok*)t->buffer)[i];
 
 		// Push token
