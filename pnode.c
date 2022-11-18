@@ -5,7 +5,7 @@
 #include"pnode.h"
 #include"tok.h"
 
-char*partype_names[]={"EXPRESSION","STATEMENT","ASSIGNMENT","IFSTATEMENT","DECLARATION","COMMENT","CODEBLOCK"};
+char*partype_names[]={"EMPTY","EXPRESSION","STATEMENT","ASSIGNMENT","IFSTATEMENT","DECLARATION","COMMENT","CODEBLOCK"};
 
 Parser parser_new(void)
 {
@@ -22,6 +22,7 @@ PNode pnode_new(void)
 		.pnodes=vec_new(sizeof(PNode)), // Empty Vec
 		.tokens=vec_new(sizeof(Tok)), // Empty Vec
 		.parentnode=NULL,
+		.type=EMPTY,
 	};
 
 	return n;
@@ -133,6 +134,8 @@ void parser_tokens(Parser*p,Vec*t)
 		//current_node->type=STATEMENT;
 		vec_pushta(&current_node->tokens,src->str.buffer);
 		tok_copy_nostr(&((Tok*)current_node->tokens.buffer)[current_node->tokens.size-1],src);
+		if(current_node->type==EMPTY)
+			current_node->type=EXPRESSION;
 
 		// Terminate statement node, set statement type
 		match(OPERATOR,ENDSTATEMENT,false,STATEMENT,true) else
