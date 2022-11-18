@@ -88,7 +88,7 @@ void lex_string(Lexer*l,char*s)
 				initmatch(operators,OPERATOR,true) else
 				initmatch("#",LCOMMENT,true) else
 				if(strchr(" \t\n",s[i])){if(s[i]=='\n')++current_line;continue;} else
-				fprintf(stderr,"error: %lu: unrecognized character '%c' (%x)\n",current_line,((s[i]>32)?(s[i]):(' ')),s[i]);
+				fprintf(stderr,"error: %lu: unrecognized character '%c' (%#x)\n",current_line,((s[i]>32)?(s[i]):(' ')),s[i]);
 				//initmatch(" \t\n",NONE,false)
 				break;
 

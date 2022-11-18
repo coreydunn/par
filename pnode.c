@@ -146,6 +146,19 @@ void parser_tokens(Parser*p,Vec*t)
 		if(current_node->type==EMPTY)
 			current_node->type=EXPRESSION;
 
+		// TODO: match assumes that the previous node has
+		// been terminated. If not, it will modify the current
+		// PNode based on the current token and start a new PNode.
+		//
+		// Problem: Initial matches will override the current PNode
+		// with the new PNode type and tokens, combining them together
+		//
+		// Solution: ensure unexpected token types will terminate
+		// previous PNodes, using grammar rules
+		// Example: ASSIGNMENT --> [IDENTIFIER, ASSIGN, OPERATOR, INTEGER, FLOAT]
+		//          COMMENT    --> [COMMENT] 
+		// See pnode.h
+
 		// Terminate statement node, set statement type
 		match(OPERATOR,ENDSTATEMENT,false,STATEMENT,true) else
 		match(OPERATOR,ASSIGN,true,ASSIGNMENT,false) else

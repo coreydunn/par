@@ -14,6 +14,7 @@ Lexer
 * Fix string type [DONE]
 * Fix operator type
 * EVERY lexeme should terminate at a NULL byte
+* Create separate lexemes for ENDSTATEMENT and ASSIGN and ARITHMETIC
 
 Parser
 
@@ -21,3 +22,4 @@ Parser
 * Store parse data in grammar tree [DONE]
 * Define grammatical structures
 	- Recursive statements (e.g., if, while...)
+* Error determining PNode type based on first token
