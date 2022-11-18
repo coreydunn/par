@@ -34,7 +34,7 @@ void lex_free(Lexer*l)
 // Read string and store tokens
 void lex_string(Lexer*l,char*s)
 {
-	Reg regex=reg_new();
+	//Reg regex=reg_new();
 	Str tmpstr=str_new();
 	char ch[2]={0};
 	size_t current_line=1;
@@ -50,6 +50,8 @@ void lex_string(Lexer*l,char*s)
 
 		/*****
 		 * initmatch(chset,mode,keepch)
+		 * - Match initial character and change lexer to corresponding mode,
+		 * - clear tmpstr and initialize new token
 		 * chset        char*     set of characters which s[i] must match
 		 * mode         uint32_t  change lexer mode to this
 		 * keepch    bool      will we retain this character in the token string?
@@ -58,6 +60,8 @@ void lex_string(Lexer*l,char*s)
 
 		/*****
 		 * modematch(chset,logic,keepch)
+		 * - Match lexeme characters following initial character,
+		 * - set token type and return lexer mode to normal
 		 * chset        char*     set of characters which s[i] must match
 		 * logic        bool      if false, only modify current token when s[i] does NOT match chset
 		 * keepch       bool      will we retain this character in the token string?
@@ -87,11 +91,6 @@ void lex_string(Lexer*l,char*s)
 				//initmatch(" \t\n",NONE,false)
 				break;
 
-				/****
-				 * TODO: something is wrong with modematch
-				 * which puts garbage chars at the beginning
-				 * of tmpstr
-				 ****/
 			// Individual modes
 			case IDENTIFIER:modematch("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789",false,true);
 							for(size_t j=0;j<sizeof(keywords)/sizeof(char*);++j)
@@ -105,13 +104,6 @@ void lex_string(Lexer*l,char*s)
 							 ((Tok*)l->tokens.buffer)[l->tokens.size-1].type=FLOAT;
 							 l->mode=FLOAT;
 						 }
-						 //{
-							 //size_t n=lex_strchrcount(tmpstr.buffer,'.');
-							 //if(n==1)
-								 //((Tok*)l->tokens.buffer)[l->tokens.size-1].type=FLOAT;
-							 //else if(n>1)
-								 //fprintf(stderr,"error: %lu: invalid float format '%s'\n",current_line,tmpstr.buffer);
-						 //}
 						 break;
 			case STRING:modematch("\"",true,false);break;
 			case OPERATOR:modematch(operators,false,true);
@@ -128,7 +120,7 @@ void lex_string(Lexer*l,char*s)
 	}
 
 	str_free(&tmpstr);
-	reg_free(&regex);
+	//reg_free(&regex);
 }
 
 void lex_print(Lexer*l)
