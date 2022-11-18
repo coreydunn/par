@@ -114,28 +114,30 @@ void parser_tokens(Parser*p,Vec*t)
 	// Do not push tokens to root node
 	PNode*current_node=pnode_pushnode(&p->root);
 
-	// Copy tokens
+	// Copy tokens, create PNodes
 	for(size_t i=0;i<t->size;++i)
 	{
-		Tok*tok=&((Tok*)t->buffer)[i];
+		/*****
+		 * match(lex_type,lex_subtype,settype,newtype,endnode)
+		 * lex_type     uint32_t  token must match this
+		 * lex_subtype  uint32_t  token must match this
+		 * settype      bool      will we modify node type?
+		 * newtype      uint32_t  change current_node type to this
+		 * endnode      bool      will we terminate current_node?
+		 *****/
+#define match(ty,subty,setty,newty,end) if(src->type==ty&&src->subtype==subty){if(setty)current_node->type=newty;if(end&&i<t->size-1)current_node=pnode_pushnode(&p->root);}
+		Tok*src=&((Tok*)t->buffer)[i];
 
 		// Push token
 		//current_node->type=STATEMENT;
-		vec_pushta(&current_node->tokens,tok->str.buffer);
-		tok_copy_nostr(&((Tok*)current_node->tokens.buffer)[current_node->tokens.size-1],tok);
+		vec_pushta(&current_node->tokens,src->str.buffer);
+		tok_copy_nostr(&((Tok*)current_node->tokens.buffer)[current_node->tokens.size-1],src);
 
-		if(tok->type==OPERATOR && tok->str.buffer[0]==';')
-		{
-			if(i<t->size-1)
-				current_node=pnode_pushnode(&p->root);
-		}
-
-		else if(tok->type==LCOMMENT)
-		{
-			current_node->type=COMMENT;
-			if(i<t->size-1)
-				current_node=pnode_pushnode(&p->root);
-		}
+		// Terminate statement node, set statement type
+		match(OPERATOR,ENDSTATEMENT,false,STATEMENT,true) else
+		match(OPERATOR,ASSIGN,true,ASSIGNMENT,false) else
+		match(LCOMMENT,0,true,COMMENT,true)
+#undef match
 	}
 
 }

@@ -9,6 +9,7 @@
 #include"reg.h"
 
 char*lextype_names[]={"NONE","IDENTIFIER","INTEGER","FLOAT","STRING","OPERATOR","KEYWORD","LCOMMENT"};
+char*lexsubtype_names[]={"ENDSTATEMENT","ASSIGN"};
 static char*operators="-+*/=;(),.";
 static char*keywords[]={"for","if","while","do","true","false"};
 
@@ -34,22 +35,35 @@ void lex_free(Lexer*l)
 void lex_string(Lexer*l,char*s)
 {
 	Reg regex=reg_new();
-	Str tmp=str_new();
-	char t[2]={0};
-	size_t strl;
+	Str tmpstr=str_new();
+	char ch[2]={0};
 	size_t current_line=1;
+	size_t strl;
 
 	if(!l||!s)return;
 
 	strl=strlen(s);
-	//if(strl>1)++strl;
 
 	// Read each individual byte
 	for(size_t i=0;i<strl;++i)
 	{
 
-#define initmatch(set,x,stripchar) if(s[i]&&memchr((set),s[i],strlen((set)))){l->mode=(x);if(stripchar)--i;vec_pushl(&l->tokens,((Tok){.str=str_new(),.type=l->mode,.line=current_line}));str_clear(&tmp);}
-#define modematch(set,logic,stripchar) do{if(!s[i]||(logic==(!!memchr((set),s[i],strlen(set)))) ){l->mode=NONE;if(stripchar)--i;str_assign(&((Tok*)l->tokens.buffer)[l->tokens.size-1].str,tmp.buffer);((Tok*)l->tokens.buffer)[l->tokens.size-1].line=current_line;}t[0]=s[i];str_append(&tmp,t);}while(0)
+		/*****
+		 * initmatch(set,mode,stripchar)
+		 * set          char*     set of characters which s[i] must match
+		 * mode         uint32_t  change lexer mode to this
+		 * stripchar    bool      will we retain this character in the token string?
+		 *****/
+#define initmatch(chset,lmode,keepch) if(s[i]&&memchr((chset),s[i],strlen((chset)))){l->mode=(lmode);if(keepch)--i;vec_pushl(&l->tokens,((Tok){.str=str_new(),.type=l->mode,.line=current_line}));str_clear(&tmpstr);}
+
+		/*****
+		 * modematch(chset,mode,keepch)
+		 * chset        char*     set of characters which s[i] must match
+		 * mode         uint32_t  change lexer mode to this
+		 * keepch       bool      will we retain this character in the token string?
+		 *****/
+#define modematch(set,logic,stripchar) do{if(!s[i]||(logic==(!!memchr((set),s[i],strlen(set)))) ){l->mode=NONE;if(stripchar)--i;str_assign(&((Tok*)l->tokens.buffer)[l->tokens.size-1].str,tmpstr.buffer);((Tok*)l->tokens.buffer)[l->tokens.size-1].line=current_line;}ch[0]=s[i];str_append(&tmpstr,ch);}while(0)
+
 		switch(l->mode)
 		{
 
@@ -76,12 +90,12 @@ void lex_string(Lexer*l,char*s)
 				/****
 				 * TODO: something is wrong with modematch
 				 * which puts garbage chars at the beginning
-				 * of tmp
+				 * of tmpstr
 				 ****/
 			// Individual modes
 			case IDENTIFIER:modematch("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789",false,true);
 							for(size_t j=0;j<sizeof(keywords)/sizeof(char*);++j)
-								if(strcmp(keywords[j],tmp.buffer)==0)
+								if(strcmp(keywords[j],tmpstr.buffer)==0)
 									((Tok*)l->tokens.buffer)[l->tokens.size-1].type=KEYWORD;
 							break;
 			case FLOAT:modematch("0123456789",false,true);break;
@@ -92,20 +106,19 @@ void lex_string(Lexer*l,char*s)
 							 l->mode=FLOAT;
 						 }
 						 //{
-							 //size_t n=lex_strchrcount(tmp.buffer,'.');
+							 //size_t n=lex_strchrcount(tmpstr.buffer,'.');
 							 //if(n==1)
 								 //((Tok*)l->tokens.buffer)[l->tokens.size-1].type=FLOAT;
 							 //else if(n>1)
-								 //fprintf(stderr,"error: %lu: invalid float format '%s'\n",current_line,tmp.buffer);
+								 //fprintf(stderr,"error: %lu: invalid float format '%s'\n",current_line,tmpstr.buffer);
 						 //}
 						 break;
 			case STRING:modematch("\"",true,false);break;
 			case OPERATOR:modematch(operators,false,true);
 						  if(s[i]==';')
-						  {
 							  ((Tok*)l->tokens.buffer)[l->tokens.size-1].subtype=ENDSTATEMENT;
-							  // Terminate token now
-						  }
+						  else if(s[i]=='=')
+							  ((Tok*)l->tokens.buffer)[l->tokens.size-1].subtype=ASSIGN;
 						  break;
 			case LCOMMENT:modematch("\n",true,true);break;
 
@@ -114,7 +127,7 @@ void lex_string(Lexer*l,char*s)
 #undef modematch
 	}
 
-	str_free(&tmp);
+	str_free(&tmpstr);
 	reg_free(&regex);
 }
 
@@ -123,11 +136,11 @@ void lex_print(Lexer*l)
 	printf("%p: [",l);
 	for(size_t i=0;i<l->tokens.size;++i)
 	{
+		Tok*tok=&((Tok*)l->tokens.buffer)[i];
 		printf("'%s'(%s %u)",
-		//printf("'%s'(%s)",
-				((Tok*)l->tokens.buffer)[i].str.buffer,
-				lextype_names[((Tok*)l->tokens.buffer)[i].type],
-				((Tok*)l->tokens.buffer)[i].type
+				tok->str.buffer,
+				((tok->subtype)?(lexsubtype_names[tok->subtype-ENDSTATEMENT]):(lextype_names[tok->type])),
+				tok->type
 				);
 		if(i<l->tokens.size-1)
 			printf(", ");
