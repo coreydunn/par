@@ -53,6 +53,8 @@ PNode*pnode_pushnode(PNode*n)
 
 void pnode_print(PNode*n,size_t lvl)
 {
+	const bool usecolor=true;
+
 	for(size_t i=0;i<lvl;++i)
 		printf("    ");
 	printf("%p: (c:%lu/%lu) (t:%lu/%lu) %lu:",
@@ -68,7 +70,14 @@ void pnode_print(PNode*n,size_t lvl)
 	printf(" [");
 	for(size_t i=0;i<n->tokens.size;++i)
 	{
-		printf("'%s'",((Tok*)n->tokens.buffer)[i].str.buffer);
+		if(usecolor)
+			printf("'%s%s%s'",
+					lextype_colors[((Tok*)n->tokens.buffer)[i].type],
+					((Tok*)n->tokens.buffer)[i].str.buffer,
+					"\033[0m"
+					);
+		else
+			printf("'%s'",((Tok*)n->tokens.buffer)[i].str.buffer);
 		if(i<n->tokens.size-1)
 			printf(", ");
 	}

@@ -9,6 +9,7 @@
 #include"reg.h"
 
 char*lextype_names[]={"NONE","IDENTIFIER","INTEGER","FLOAT","STRING","OPERATOR","KEYWORD","LCOMMENT"};
+char*lextype_colors[]={"\033[0m","\033[0m","\033[36m","\033[35m","\033[32m","\033[0m","\033[33m","\033[34m"};
 char*lexsubtype_names[]={"ENDSTATEMENT","ASSIGN"};
 static char*operators="-+*/=;(),.";
 static char*keywords[]={"for","if","while","do","true","false"};

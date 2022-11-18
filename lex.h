@@ -16,6 +16,7 @@ enum LEXTYPE {NONE, IDENTIFIER, INTEGER, FLOAT, STRING, OPERATOR, KEYWORD, LCOMM
 enum LEXSUBTYPE {ENDSTATEMENT=55, ASSIGN, };
 extern char*lextype_names[];
 extern char*lexsubtype_names[];
+extern char*lextype_colors[];
 
 typedef struct Lexer
 {
