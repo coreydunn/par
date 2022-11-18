@@ -119,32 +119,23 @@ void parser_tokens(Parser*p,Vec*t)
 	{
 		Tok*tok=&((Tok*)t->buffer)[i];
 
+		// Push token
 		//current_node->type=STATEMENT;
+		vec_pushta(&current_node->tokens,tok->str.buffer);
+		tok_copy_nostr(&((Tok*)current_node->tokens.buffer)[current_node->tokens.size-1],tok);
 
 		if(tok->type==OPERATOR && tok->str.buffer[0]==';')
 		{
-			//current_node->type=STATEMENT;
-			vec_pushta(&current_node->tokens,tok->str.buffer);
-			((Tok*)current_node->tokens.buffer)[current_node->tokens.size-1].line = tok->line;
 			if(i<t->size-1)
 				current_node=pnode_pushnode(&p->root);
 		}
 
-		else if(tok->type==LCOMMENT && tok->str.buffer[0]=='#')
+		else if(tok->type==LCOMMENT)
 		{
 			current_node->type=COMMENT;
-			vec_pushta(&current_node->tokens,tok->str.buffer);
-			((Tok*)current_node->tokens.buffer)[current_node->tokens.size-1].line = tok->line;
 			if(i<t->size-1)
 				current_node=pnode_pushnode(&p->root);
 		}
-
-		else
-		{
-			vec_pushta(&current_node->tokens,tok->str.buffer);
-			((Tok*)current_node->tokens.buffer)[current_node->tokens.size-1].line = tok->line;
-		}
-		//vec_pushta(&parser.root.tokens,(((Tok*)lexer.tokens.buffer)[i].str.buffer));
 	}
 
 }

@@ -13,8 +13,10 @@ typedef struct Tok
 {
 	Str str;
 	uint32_t type;
+	uint32_t subtype;
 	size_t line;
 } Tok;
 
-void tok_free(Tok*t);
 Tok tok_new(void);
+void tok_copy_nostr(Tok*dst,Tok*src);
+void tok_free(Tok*t);

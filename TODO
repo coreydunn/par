@@ -13,6 +13,7 @@ Lexer
 * Preidentifiers --> (identifier|keyword)
 * Fix string type [DONE]
 * Fix operator type
+* EVERY lexeme should terminate at a NULL byte
 
 Parser
 

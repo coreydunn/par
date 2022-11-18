@@ -100,7 +100,13 @@ void lex_string(Lexer*l,char*s)
 						 //}
 						 break;
 			case STRING:modematch("\"",true,false);break;
-			case OPERATOR:modematch(operators,false,true);break;
+			case OPERATOR:modematch(operators,false,true);
+						  if(s[i]==';')
+						  {
+							  ((Tok*)l->tokens.buffer)[l->tokens.size-1].subtype=ENDSTATEMENT;
+							  // Terminate token now
+						  }
+						  break;
 			case LCOMMENT:modematch("\n",true,true);break;
 
 		}
