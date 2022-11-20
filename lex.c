@@ -10,7 +10,7 @@
 
 char*lextype_names[]={"LNONE","LIDENTIFIER","LINTEGER","LFLOAT","LSTRING","LOPERATOR","LKEYWORD","LCOMMENT"};
 char*lextype_colors[]={"\033[0m","\033[0m","\033[36m","\033[35m","\033[32m","\033[0m","\033[33m","\033[34m"};
-char*lexsubtype_names[]={"LENDSTATEMENT","LASSIGN"};
+char*lexsubtype_names[]={"LENDSTATEMENT","LASSIGN","LLPAREN","LRPAREN"};
 static char*operators="-+*/=;(),.";
 static char*keywords[]={"for","if","while","do","true","false"};
 
@@ -110,8 +110,12 @@ void lex_string(Lexer*l,char*s)
 			case LOPERATOR:modematch(operators,false,true);
 						  if(s[i]==';')
 							  ((Tok*)l->tokens.buffer)[l->tokens.size-1].subtype=LENDSTATEMENT;
-						  else if(s[i]=='=')
+						  else if(s[i]=='='&&((Tok*)l->tokens.buffer)[l->tokens.size-1].str.size==1)
 							  ((Tok*)l->tokens.buffer)[l->tokens.size-1].subtype=LASSIGN;
+						   else if(s[i]=='(')
+							  ((Tok*)l->tokens.buffer)[l->tokens.size-1].subtype=LLPAREN;
+						   else if(s[i]==')')
+							  ((Tok*)l->tokens.buffer)[l->tokens.size-1].subtype=LRPAREN;
 						  break;
 			case LCOMMENT:modematch("\n",true,true);break;
 

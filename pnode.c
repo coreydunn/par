@@ -186,14 +186,18 @@ void parser_parse(Parser*p,PNode*n,Vec*t)
 		{
 
 			case PNONE:
-#define descend(m) do{--i;current_node=pnode_pushnode(current_node);current_node->type=m;p->mode=m;}while(0)
-				//printf("'%s' PNONE\n",cur_tok->str.buffer);
+#define descend(n,m) do{--i;current_node=pnode_pushnode(n);current_node->type=m;p->mode=m;}while(0)
 				switch(cur_tok->type)
 				{
-					case LCOMMENT:descend(PCOMMENT);break;
-					default:descend(PEXPRESSION);break;
+
+					case LKEYWORD:
+						if(strcmp("if",cur_tok->str.buffer)==0)
+							descend(n,PIFSTATEMENT);
+						break;
+
+					case LCOMMENT:descend(n,PCOMMENT);break;
+					default:descend(n,PEXPRESSION);break;
 				}
-#undef descend
 				break;
 
 			case PCOMMENT:
@@ -203,14 +207,23 @@ void parser_parse(Parser*p,PNode*n,Vec*t)
 				current_node=current_node->parentnode;
 				break;
 
+			case PIFSTATEMENT:
+				//if(cur_tok->type==LOPERATOR&&cur_tok->subtype==LRPAREN){descend(current_node,PNONE);break;}
+				vec_pushta(&current_node->tokens,cur_tok->str.buffer);
+				tok_copy_nostr(&((Tok*)current_node->tokens.buffer)[current_node->tokens.size-1],&((Tok*)t->buffer)[i]);
+				if(cur_tok->type==LOPERATOR&&cur_tok->subtype==LRPAREN){++i;p->mode=PNONE;descend(current_node,PNONE);break;}
+				break;
+
 			case PEXPRESSION:
 			default:
 				if(cur_tok->type==LCOMMENT){p->mode=PCOMMENT;--i;break;}
 				if(cur_tok->type==LOPERATOR&&cur_tok->subtype==LENDSTATEMENT){p->mode=PNONE;break;}
+				if(cur_tok->type==LOPERATOR&&cur_tok->subtype==LASSIGN){p->mode=PASSIGNMENT;current_node->type=PASSIGNMENT;}
 				vec_pushta(&current_node->tokens,cur_tok->str.buffer);
 				tok_copy_nostr(&((Tok*)current_node->tokens.buffer)[current_node->tokens.size-1],&((Tok*)t->buffer)[i]);
 				//vec_pushta(&current_node->tokens,);
 				break;
 		}
+#undef descend
 	}
 }
