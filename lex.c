@@ -10,8 +10,8 @@
 
 char*lextype_names[]={"LNONE","LIDENTIFIER","LINTEGER","LFLOAT","LSTRING","LOPERATOR","LKEYWORD","LCOMMENT"};
 char*lextype_colors[]={"\033[0m","\033[0m","\033[36m","\033[35m","\033[32m","\033[0m","\033[33m","\033[34m"};
-char*lexsubtype_names[]={"LENDSTATEMENT","LASSIGN","LLPAREN","LRPAREN"};
-static char*operators="-+*/=;(),.";
+char*lexsubtype_names[]={"LENDSTATEMENT","LASSIGN","LLPAREN","LRPAREN","LLCBRACE","LRCBRACE"};
+static char*operators="-+*/=;(),.{}";
 static char*keywords[]={"for","if","while","do","true","false"};
 
 Lexer lex_new(void)
@@ -116,6 +116,10 @@ void lex_string(Lexer*l,char*s)
 							  ((Tok*)l->tokens.buffer)[l->tokens.size-1].subtype=LLPAREN;
 						   else if(s[i]==')')
 							  ((Tok*)l->tokens.buffer)[l->tokens.size-1].subtype=LRPAREN;
+						   else if(s[i]=='{')
+							  ((Tok*)l->tokens.buffer)[l->tokens.size-1].subtype=LLCBRACE;
+						   else if(s[i]=='}')
+							  ((Tok*)l->tokens.buffer)[l->tokens.size-1].subtype=LRCBRACE;
 						  break;
 			case LCOMMENT:modematch("\n",true,true);break;
 

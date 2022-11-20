@@ -182,17 +182,30 @@ void parser_parse(Parser*p,PNode*n,Vec*t)
 		if(!current_node)current_node=&p->root;
 		cur_tok=((Tok*)t->buffer)+i;
 		//printf("%lu ",i);
+#define descend(n,m) do{--i;current_node=pnode_pushnode(n);current_node->type=m;p->mode=m;}while(0)
+#define pushcurrenttoken() do{vec_pushta(&current_node->tokens,cur_tok->str.buffer);tok_copy_nostr(&((Tok*)current_node->tokens.buffer)[current_node->tokens.size-1],&((Tok*)t->buffer)[i]);}while(0)
 		switch(p->mode)
 		{
 
 			case PNONE:
-#define descend(n,m) do{--i;current_node=pnode_pushnode(n);current_node->type=m;p->mode=m;}while(0)
 				switch(cur_tok->type)
 				{
 
 					case LKEYWORD:
 						if(strcmp("if",cur_tok->str.buffer)==0)
+						{
+							++i;
 							descend(n,PIFSTATEMENT);
+						}
+						break;
+
+					case LOPERATOR:
+						if(cur_tok->subtype==LLCBRACE)
+						{
+							printf("BLOCK OF CODE YES PLS\n");
+							p->mode=PCODEBLOCK;
+							descend(current_node,PCODEBLOCK);
+						}
 						break;
 
 					case LCOMMENT:descend(n,PCOMMENT);break;
@@ -201,17 +214,20 @@ void parser_parse(Parser*p,PNode*n,Vec*t)
 				break;
 
 			case PCOMMENT:
-				vec_pushta(&current_node->tokens,cur_tok->str.buffer);
-				tok_copy_nostr(&((Tok*)current_node->tokens.buffer)[current_node->tokens.size-1],&((Tok*)t->buffer)[i]);
+				pushcurrenttoken();
 				p->mode=PNONE;
 				current_node=current_node->parentnode;
 				break;
 
 			case PIFSTATEMENT:
-				//if(cur_tok->type==LOPERATOR&&cur_tok->subtype==LRPAREN){descend(current_node,PNONE);break;}
-				vec_pushta(&current_node->tokens,cur_tok->str.buffer);
-				tok_copy_nostr(&((Tok*)current_node->tokens.buffer)[current_node->tokens.size-1],&((Tok*)t->buffer)[i]);
-				if(cur_tok->type==LOPERATOR&&cur_tok->subtype==LRPAREN){++i;p->mode=PNONE;descend(current_node,PNONE);break;}
+				pushcurrenttoken();
+				if(cur_tok->type==LOPERATOR&&cur_tok->subtype==LRPAREN){
+					++i;p->mode=PNONE;descend(current_node,PEXPRESSION);break;}
+				break;
+
+			case PCODEBLOCK:
+				if(cur_tok->type==LOPERATOR&&cur_tok->subtype==LRCBRACE){current_node=current_node->parentnode;p->mode=PNONE;break;}
+				descend(current_node,PEXPRESSION);
 				break;
 
 			case PEXPRESSION:
@@ -219,8 +235,9 @@ void parser_parse(Parser*p,PNode*n,Vec*t)
 				if(cur_tok->type==LCOMMENT){p->mode=PCOMMENT;--i;break;}
 				if(cur_tok->type==LOPERATOR&&cur_tok->subtype==LENDSTATEMENT){p->mode=PNONE;break;}
 				if(cur_tok->type==LOPERATOR&&cur_tok->subtype==LASSIGN){p->mode=PASSIGNMENT;current_node->type=PASSIGNMENT;}
-				vec_pushta(&current_node->tokens,cur_tok->str.buffer);
-				tok_copy_nostr(&((Tok*)current_node->tokens.buffer)[current_node->tokens.size-1],&((Tok*)t->buffer)[i]);
+				if(cur_tok->type==LOPERATOR&&cur_tok->subtype==LLCBRACE){p->mode=PCODEBLOCK;current_node->type=PCODEBLOCK;}
+				if(cur_tok->type==LKEYWORD&&strcmp("if",cur_tok->str.buffer)==0){p->mode=PIFSTATEMENT;current_node->type=PIFSTATEMENT;break;}
+				pushcurrenttoken();
 				//vec_pushta(&current_node->tokens,);
 				break;
 		}
