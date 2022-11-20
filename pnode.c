@@ -5,7 +5,7 @@
 #include"pnode.h"
 #include"tok.h"
 
-char*partype_names[]={"PEMPTY","PEXPRESSION","PSTATEMENT","PASSIGNMENT","PIFSTATEMENT","PDECLARATION","PCOMMENT","PCODEBLOCK"};
+char*partype_names[]={"PNONE","PEMPTY","PEXPRESSION","PSTATEMENT","PASSIGNMENT","PIFSTATEMENT","PDECLARATION","PCOMMENT","PCODEBLOCK"};
 
 Parser parser_new(void)
 {
@@ -48,6 +48,7 @@ PNode*pnode_pushnode(PNode*n)
 	if(!n)return NULL;
 
 	vec_push(&n->pnodes,&t);
+	((PNode*)n->pnodes.buffer)[n->pnodes.size-1].parentnode=n;
 	return &((PNode*)n->pnodes.buffer)[n->pnodes.size-1];
 }
 
@@ -168,18 +169,47 @@ void parser_tokens(Parser*p,Vec*t)
 
 }
 
-void parser_parse(Parser*p,PNode*n,Vec*t,size_t i)
+void parser_parse(Parser*p,PNode*n,Vec*t)
 {
+	PNode*current_node=NULL;
+	Tok*cur_tok=NULL;
 	if(!p||!t)return;
 
-	for(size_t j=0;j<t->size;++j)
+	p->root.type=PEMPTY;
+
+	for(size_t i=0;i<t->size;++i)
 	{
+		if(!current_node)current_node=&p->root;
+		cur_tok=((Tok*)t->buffer)+i;
+		//printf("%lu ",i);
 		switch(p->mode)
 		{
 
-			default:
 			case PNONE:
-				parser_parse(p,pnode_pushnode(n),t,i+j);
+#define descend(m) do{--i;current_node=pnode_pushnode(current_node);current_node->type=m;p->mode=m;}while(0)
+				//printf("'%s' PNONE\n",cur_tok->str.buffer);
+				switch(cur_tok->type)
+				{
+					case LCOMMENT:descend(PCOMMENT);break;
+					default:descend(PEXPRESSION);break;
+				}
+#undef descend
+				break;
+
+			case PCOMMENT:
+				vec_pushta(&current_node->tokens,cur_tok->str.buffer);
+				tok_copy_nostr(&((Tok*)current_node->tokens.buffer)[current_node->tokens.size-1],&((Tok*)t->buffer)[i]);
+				p->mode=PNONE;
+				current_node=current_node->parentnode;
+				break;
+
+			case PEXPRESSION:
+			default:
+				if(cur_tok->type==LCOMMENT){p->mode=PCOMMENT;--i;break;}
+				if(cur_tok->type==LOPERATOR&&cur_tok->subtype==LENDSTATEMENT){p->mode=PNONE;break;}
+				vec_pushta(&current_node->tokens,cur_tok->str.buffer);
+				tok_copy_nostr(&((Tok*)current_node->tokens.buffer)[current_node->tokens.size-1],&((Tok*)t->buffer)[i]);
+				//vec_pushta(&current_node->tokens,);
 				break;
 		}
 	}

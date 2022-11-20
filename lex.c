@@ -126,7 +126,7 @@ void lex_string(Lexer*l,char*s)
 
 void lex_print(Lexer*l)
 {
-	printf("%p: [",l);
+	printf("%p: (%lu/%lu) [",l,l->tokens.size,l->tokens.capacity);
 	for(size_t i=0;i<l->tokens.size;++i)
 	{
 		Tok*tok=&((Tok*)l->tokens.buffer)[i];
