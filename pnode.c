@@ -5,7 +5,7 @@
 #include"pnode.h"
 #include"tok.h"
 
-char*partype_names[]={"EMPTY","EXPRESSION","STATEMENT","ASSIGNMENT","IFSTATEMENT","DECLARATION","COMMENT","CODEBLOCK"};
+char*partype_names[]={"PEMPTY","PEXPRESSION","PSTATEMENT","PASSIGNMENT","PIFSTATEMENT","PDECLARATION","PCOMMENT","PCODEBLOCK"};
 
 Parser parser_new(void)
 {
@@ -22,7 +22,7 @@ PNode pnode_new(void)
 		.pnodes=vec_new(sizeof(PNode)), // Empty Vec
 		.tokens=vec_new(sizeof(Tok)), // Empty Vec
 		.parentnode=NULL,
-		.type=EMPTY,
+		.type=PEMPTY,
 	};
 
 	return n;
@@ -140,11 +140,11 @@ void parser_tokens(Parser*p,Vec*t)
 		Tok*src=&((Tok*)t->buffer)[i];
 
 		// Push token
-		//current_node->type=STATEMENT;
+		//current_node->type=PSTATEMENT;
 		vec_pushta(&current_node->tokens,src->str.buffer);
 		tok_copy_nostr(&((Tok*)current_node->tokens.buffer)[current_node->tokens.size-1],src);
-		if(current_node->type==EMPTY)
-			current_node->type=EXPRESSION;
+		if(current_node->type==PEMPTY)
+			current_node->type=PEXPRESSION;
 
 		// TODO: match assumes that the previous node has
 		// been terminated. If not, it will modify the current
@@ -160,10 +160,27 @@ void parser_tokens(Parser*p,Vec*t)
 		// See pnode.h
 
 		// Terminate statement node, set statement type
-		match(OPERATOR,ENDSTATEMENT,false,STATEMENT,true) else
-		match(OPERATOR,ASSIGN,true,ASSIGNMENT,false) else
-		match(LCOMMENT,0,true,COMMENT,true)
+		match(LOPERATOR,LENDSTATEMENT,false,PSTATEMENT,true) else
+		match(LOPERATOR,LASSIGN,true,PASSIGNMENT,false) else
+		match(LCOMMENT,0,true,PCOMMENT,true)
 #undef match
 	}
 
+}
+
+void parser_parse(Parser*p,PNode*n,Vec*t,size_t i)
+{
+	if(!p||!t)return;
+
+	for(size_t j=0;j<t->size;++j)
+	{
+		switch(p->mode)
+		{
+
+			default:
+			case PNONE:
+				parser_parse(p,pnode_pushnode(n),t,i+j);
+				break;
+		}
+	}
 }

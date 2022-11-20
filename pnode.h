@@ -8,7 +8,7 @@
 
 //#define vec_pushn(v,n) do{PNode x=n;vec_push(v,&x);}while(0)
 
-enum PARTYPE {EMPTY, EXPRESSION, STATEMENT, ASSIGNMENT, IFSTATEMENT, DECLARATION, COMMENT, CODEBLOCK};
+enum PARTYPE {PNONE, PEMPTY, PEXPRESSION, PSTATEMENT, PASSIGNMENT, PIFSTATEMENT, PDECLARATION, PCOMMENT, PCODEBLOCK};
 
 extern char*partype_names[];
 
@@ -42,6 +42,7 @@ typedef struct Parser
 PNode pnode_new(void);
 PNode*pnode_pushnode(PNode*n);
 Parser parser_new(void);
+void parser_parse(Parser*p,PNode*n,Vec*t,size_t i);
 void parser_tokens(Parser*p,Vec*t);
 void pnode_free(PNode*n);
 void pnode_print(PNode*n,size_t lvl);

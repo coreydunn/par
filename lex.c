@@ -8,16 +8,16 @@
 #include"str.h"
 #include"reg.h"
 
-char*lextype_names[]={"NONE","IDENTIFIER","INTEGER","FLOAT","STRING","OPERATOR","KEYWORD","LCOMMENT"};
+char*lextype_names[]={"LNONE","LIDENTIFIER","LINTEGER","LFLOAT","LSTRING","LOPERATOR","LKEYWORD","LCOMMENT"};
 char*lextype_colors[]={"\033[0m","\033[0m","\033[36m","\033[35m","\033[32m","\033[0m","\033[33m","\033[34m"};
-char*lexsubtype_names[]={"ENDSTATEMENT","ASSIGN"};
+char*lexsubtype_names[]={"LENDSTATEMENT","LASSIGN"};
 static char*operators="-+*/=;(),.";
 static char*keywords[]={"for","if","while","do","true","false"};
 
 Lexer lex_new(void)
 {
 	Lexer l={
-		.mode=NONE,
+		.mode=LNONE,
 		.tokens=vec_new(sizeof(Tok)),
 	};
 
@@ -67,7 +67,7 @@ void lex_string(Lexer*l,char*s)
 		 * logic        bool      if false, only modify current token when s[i] does NOT match chset
 		 * keepch       bool      will we retain this character in the token string?
 		 *****/
-#define modematch(chset,logic,keepch) do{if(!s[i]||(logic==(!!memchr((chset),s[i],strlen(chset)))) ){l->mode=NONE;if(keepch)--i;str_assign(&((Tok*)l->tokens.buffer)[l->tokens.size-1].str,tmpstr.buffer);((Tok*)l->tokens.buffer)[l->tokens.size-1].line=current_line;}ch[0]=s[i];str_append(&tmpstr,ch);}while(0)
+#define modematch(chset,logic,keepch) do{if(!s[i]||(logic==(!!memchr((chset),s[i],strlen(chset)))) ){l->mode=LNONE;if(keepch)--i;str_assign(&((Tok*)l->tokens.buffer)[l->tokens.size-1].str,tmpstr.buffer);((Tok*)l->tokens.buffer)[l->tokens.size-1].line=current_line;}ch[0]=s[i];str_append(&tmpstr,ch);}while(0)
 
 		switch(l->mode)
 		{
@@ -80,38 +80,38 @@ void lex_string(Lexer*l,char*s)
 			 * and set its type to the Lexer
 			 * mode and initialize its str
 			 *****/
-			case NONE:
+			case LNONE:
 			default:
-				initmatch("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_",IDENTIFIER,true) else
-				initmatch("\"",STRING,false) else
-				initmatch("0123456789",INTEGER,true) else
-				initmatch(operators,OPERATOR,true) else
+				initmatch("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_",LIDENTIFIER,true) else
+				initmatch("\"",LSTRING,false) else
+				initmatch("0123456789",LINTEGER,true) else
+				initmatch(operators,LOPERATOR,true) else
 				initmatch("#",LCOMMENT,true) else
 				if(strchr(" \t\n",s[i])){if(s[i]=='\n')++current_line;continue;} else
 				fprintf(stderr,"error: %lu: unrecognized character '%c' (%#x)\n",current_line,((s[i]>32)?(s[i]):(' ')),s[i]);
-				//initmatch(" \t\n",NONE,false)
+				//initmatch(" \t\n",LNONE,false)
 				break;
 
 			// Individual modes
-			case IDENTIFIER:modematch("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789",false,true);
+			case LIDENTIFIER:modematch("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789",false,true);
 							for(size_t j=0;j<sizeof(keywords)/sizeof(char*);++j)
 								if(strcmp(keywords[j],tmpstr.buffer)==0)
-									((Tok*)l->tokens.buffer)[l->tokens.size-1].type=KEYWORD;
+									((Tok*)l->tokens.buffer)[l->tokens.size-1].type=LKEYWORD;
 							break;
-			case FLOAT:modematch("0123456789",false,true);break;
-			case INTEGER:modematch("0123456789.",false,true);
+			case LFLOAT:modematch("0123456789",false,true);break;
+			case LINTEGER:modematch("0123456789.",false,true);
 						 if(s[i]=='.')
 						 {
-							 ((Tok*)l->tokens.buffer)[l->tokens.size-1].type=FLOAT;
-							 l->mode=FLOAT;
+							 ((Tok*)l->tokens.buffer)[l->tokens.size-1].type=LFLOAT;
+							 l->mode=LFLOAT;
 						 }
 						 break;
-			case STRING:modematch("\"",true,false);break;
-			case OPERATOR:modematch(operators,false,true);
+			case LSTRING:modematch("\"",true,false);break;
+			case LOPERATOR:modematch(operators,false,true);
 						  if(s[i]==';')
-							  ((Tok*)l->tokens.buffer)[l->tokens.size-1].subtype=ENDSTATEMENT;
+							  ((Tok*)l->tokens.buffer)[l->tokens.size-1].subtype=LENDSTATEMENT;
 						  else if(s[i]=='=')
-							  ((Tok*)l->tokens.buffer)[l->tokens.size-1].subtype=ASSIGN;
+							  ((Tok*)l->tokens.buffer)[l->tokens.size-1].subtype=LASSIGN;
 						  break;
 			case LCOMMENT:modematch("\n",true,true);break;
 
@@ -132,7 +132,7 @@ void lex_print(Lexer*l)
 		Tok*tok=&((Tok*)l->tokens.buffer)[i];
 		printf("'%s'(%s %u)",
 				tok->str.buffer,
-				((tok->subtype)?(lexsubtype_names[tok->subtype-ENDSTATEMENT]):(lextype_names[tok->type])),
+				((tok->subtype)?(lexsubtype_names[tok->subtype-LENDSTATEMENT]):(lextype_names[tok->type])),
 				tok->type
 				);
 		if(i<l->tokens.size-1)

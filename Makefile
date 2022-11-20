@@ -8,4 +8,4 @@ all: par
 par: main.o $(OBJS)
 	$(CC) $^ -o $@ $(LDFLAGS)
 clean:
-	$(RM) *.o $(OBJS)
+	$(RM) *.o $(OBJS) par

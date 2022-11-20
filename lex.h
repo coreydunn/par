@@ -12,8 +12,8 @@
 
 #define vec_pushl(v,l) do{Tok x=l;vec_push(v,&x);}while(0)
 
-enum LEXTYPE {NONE, IDENTIFIER, INTEGER, FLOAT, STRING, OPERATOR, KEYWORD, LCOMMENT, };
-enum LEXSUBTYPE {ENDSTATEMENT=55, ASSIGN, };
+enum LEXTYPE {LNONE, LIDENTIFIER, LINTEGER, LFLOAT, LSTRING, LOPERATOR, LKEYWORD, LCOMMENT, };
+enum LEXSUBTYPE {LENDSTATEMENT=55, LASSIGN, };
 extern char*lextype_names[];
 extern char*lexsubtype_names[];
 extern char*lextype_colors[];
