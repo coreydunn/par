@@ -42,7 +42,7 @@ typedef struct Parser
 PNode pnode_new(void);
 PNode*pnode_pushnode(PNode*n);
 Parser parser_new(void);
-void parser_parse(Parser*p,PNode*n,Vec*t);
+void parser_parse(Parser*p,Vec*t);
 void parser_tokens(Parser*p,Vec*t);
 void pnode_free(PNode*n);
 void pnode_print(PNode*n,size_t lvl);

@@ -117,7 +117,7 @@ void pnode_print_brief(PNode*n,size_t lvl)
 }
 
 // Parse Vec of Tok
-void parser_parse(Parser*p,PNode*n,Vec*t)
+void parser_parse(Parser*p,Vec*t)
 {
 	PNode*current_node=NULL;
 	Tok*cur_tok=NULL;
