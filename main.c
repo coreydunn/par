@@ -46,7 +46,7 @@ int main(int argc,char**argv)
 		lex_string(&par.lexer,par.input_buffer.buffer);
 		str_free(&par.input_buffer);
 		lex_print(&par.lexer);
-		parser_tokens(&par.parser,&par.lexer.tokens);
+		parser_parse(&par.parser,&par.parser.root,&par.lexer.tokens);
 		lex_free(&par.lexer);
 		pnode_print(&par.parser.root,0);
 	}
