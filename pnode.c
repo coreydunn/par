@@ -5,7 +5,7 @@
 #include"pnode.h"
 #include"tok.h"
 
-char*partype_names[]={"PNONE","PEMPTY","PEXPRESSION","PSTATEMENT","PASSIGNMENT","PIFSTATEMENT","PDECLARATION","PCOMMENT","PCODEBLOCK"};
+char*partype_names[]={"PNONE","PEMPTY","PEXPRESSION","PSTATEMENT","PASSIGNMENT","PIFSTATEMENT","PDECLARATION","PCOMMENT","PBLOCK"};
 
 Parser parser_new(void)
 {
@@ -145,7 +145,7 @@ void parser_parse(Parser*p,Vec*t)
 						if(strcmp("if",cur_tok->str.buffer)==0){++i;descend(PIFSTATEMENT);}break;
 
 					case LOPERATOR:
-						if(cur_tok->subtype==LLCBRACE){p->mode=PCODEBLOCK;descend(PCODEBLOCK);}
+						if(cur_tok->subtype==LLCBRACE){p->mode=PBLOCK;descend(PBLOCK);}
 						else if(cur_tok->subtype==LRCBRACE){up();}
 						break;
 
@@ -154,11 +154,7 @@ void parser_parse(Parser*p,Vec*t)
 				}
 				break;
 
-			case PCOMMENT:
-				pushcurrenttoken();
-				p->mode=PNONE;
-				current_node=current_node->parentnode;
-				break;
+			case PCOMMENT:pushcurrenttoken();p->mode=PNONE;break;
 
 			case PIFSTATEMENT:
 				pushcurrenttoken();
@@ -166,17 +162,20 @@ void parser_parse(Parser*p,Vec*t)
 					++i;p->mode=PNONE;descend(PEXPRESSION);break;}
 				break;
 
-			case PCODEBLOCK:
-				if(cur_tok->type==LOPERATOR&&cur_tok->subtype==LRCBRACE){current_node=current_node->parentnode;p->mode=PNONE;break;}
+			case PBLOCK:
+				if(cur_tok->type==LOPERATOR&&cur_tok->subtype==LRCBRACE){up();p->mode=PNONE;break;}
 				descend(PEXPRESSION);
 				break;
 
+				// TODO: The default case needs more sophisticated grammar rules
+				// And we should also split cases apart
 			case PEXPRESSION:
+			case PASSIGNMENT:
 			default:
 				if(cur_tok->type==LCOMMENT){p->mode=PCOMMENT;--i;break;}
 				if(cur_tok->type==LOPERATOR&&cur_tok->subtype==LENDSTATEMENT){p->mode=PNONE;break;}
 				if(cur_tok->type==LOPERATOR&&cur_tok->subtype==LASSIGN){p->mode=PASSIGNMENT;current_node->type=PASSIGNMENT;}
-				if(cur_tok->type==LOPERATOR&&cur_tok->subtype==LLCBRACE){p->mode=PCODEBLOCK;current_node->type=PCODEBLOCK;}
+				if(cur_tok->type==LOPERATOR&&cur_tok->subtype==LLCBRACE){p->mode=PBLOCK;current_node->type=PBLOCK;}
 				if(cur_tok->type==LOPERATOR&&cur_tok->subtype==LRCBRACE){p->mode=PNONE;up();break;}
 				if(cur_tok->type==LKEYWORD&&strcmp("if",cur_tok->str.buffer)==0){p->mode=PIFSTATEMENT;current_node->type=PIFSTATEMENT;break;}
 				pushcurrenttoken();
