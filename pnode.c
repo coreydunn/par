@@ -214,6 +214,7 @@ void parser_parse(Parser*p,Vec*t)
 
 			case PVARDECL:
 				checktypesub(LOPERATOR,LENDSTATEMENT){p->mode=PNONE;break;}
+				checktypesub(LOPERATOR,LRCBRACE){up();p->mode=PNONE;break;}
 				pushcurrenttoken();
 				break;
 
