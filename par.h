@@ -10,6 +10,7 @@
 #include"reg.h"
 #include"str.h"
 #include"vec.h"
+#include"var.h"
 
 // State for par program
 typedef struct State

@@ -4,16 +4,26 @@
 #include"vec.h"
 #include"pnode.h"
 #include"tok.h"
+#include"var.h"
 
-char*partype_names[]={"PNONE","PEMPTY","PEXPRESSION","PSTATEMENT","PASSIGNMENT","PIFSTATEMENT","PDECLARATION","PCOMMENT","PBLOCK","PWHILESTATEMENT"};
+char*partype_names[]={"PNONE","PEMPTY","PEXPRESSION","PSTATEMENT","PASSIGNMENT","PIF","PCOMMENT","PBLOCK","PWHILE","PVARDECL"};
 
 Parser parser_new(void)
 {
 	Parser p={
 		.root=pnode_new(),
 		.mode=0,
+		.variables=vec_new(sizeof(Var)),
 	};
 	return p;
+}
+
+void parser_free(Parser*p)
+{
+	pnode_free(&p->root);
+	for(size_t i=0;i<p->variables.size;++i)
+		var_free(&((Var*)p->variables.buffer)[i]);
+	vec_free(&p->variables);
 }
 
 PNode pnode_new(void)
@@ -149,16 +159,17 @@ void parser_parse(Parser*p,Vec*t)
 		{
 
 			case PNONE:
-				while(current_node->parentnode&&(current_node->parentnode->type==PIFSTATEMENT||
-						current_node->parentnode->type==PWHILESTATEMENT))
+				while(current_node->parentnode&&(current_node->parentnode->type==PIF||
+						current_node->parentnode->type==PWHILE))
 					up();
 				up();
 				switch(cur_tok->type)
 				{
 
 					case LKEYWORD:
-						if(strcmp("if",cur_tok->str.buffer)==0){++i;descend(PIFSTATEMENT);}
-						else if(strcmp("while",cur_tok->str.buffer)==0){++i;descend(PWHILESTATEMENT);}
+						if(strcmp("if",cur_tok->str.buffer)==0){++i;descend(PIF);}
+						else if(strcmp("while",cur_tok->str.buffer)==0){++i;descend(PWHILE);}
+						else if(strcmp("let",cur_tok->str.buffer)==0){++i;descend(PVARDECL);}
 						break;
 
 					case LOPERATOR:
@@ -173,13 +184,13 @@ void parser_parse(Parser*p,Vec*t)
 
 			case PCOMMENT:pushcurrenttoken();p->mode=PNONE;break;
 
-			case PIFSTATEMENT:
+			case PIF:
 				pushcurrenttoken();
 				if(cur_tok->type==LOPERATOR&&cur_tok->subtype==LRPAREN){
 					++i;p->mode=PNONE;descend(PEXPRESSION);break;}
 				break;
 
-			case PWHILESTATEMENT:
+			case PWHILE:
 				pushcurrenttoken();
 				if(cur_tok->type==LOPERATOR&&cur_tok->subtype==LRPAREN){
 					++i;p->mode=PNONE;descend(PEXPRESSION);break;}
@@ -190,21 +201,26 @@ void parser_parse(Parser*p,Vec*t)
 				descend(PEXPRESSION);
 				break;
 
+			case PVARDECL:
+				if(cur_tok->type==LOPERATOR&&cur_tok->subtype==LENDSTATEMENT){p->mode=PNONE;break;}
+				pushcurrenttoken();
+				break;
+
 				// TODO: The default case needs more sophisticated grammar rules
 				// And we should also split cases apart
 			case PEXPRESSION:
 			case PASSIGNMENT:
 			default:
 				if(cur_tok->type==LCOMMENT){p->mode=PCOMMENT;--i;break;}
-				if(cur_tok->type==LOPERATOR&&cur_tok->subtype==LENDSTATEMENT){if(current_node->parentnode->type==PIFSTATEMENT)up();
+				if(cur_tok->type==LOPERATOR&&cur_tok->subtype==LENDSTATEMENT){if(current_node->parentnode->type==PIF)up();
 					p->mode=PNONE;break;}
-				if(cur_tok->type==LOPERATOR&&cur_tok->subtype==LENDSTATEMENT){if(current_node->parentnode->type==PWHILESTATEMENT)up();
+				if(cur_tok->type==LOPERATOR&&cur_tok->subtype==LENDSTATEMENT){if(current_node->parentnode->type==PWHILE)up();
 					p->mode=PNONE;break;}
 				if(cur_tok->type==LOPERATOR&&cur_tok->subtype==LASSIGN){p->mode=PASSIGNMENT;current_node->type=PASSIGNMENT;}
 				if(cur_tok->type==LOPERATOR&&cur_tok->subtype==LLCBRACE){p->mode=PBLOCK;current_node->type=PBLOCK;break;}
 				if(cur_tok->type==LOPERATOR&&cur_tok->subtype==LRCBRACE){p->mode=PNONE;up();break;}
-				if(cur_tok->type==LKEYWORD&&strcmp("if",cur_tok->str.buffer)==0){p->mode=PIFSTATEMENT;current_node->type=PIFSTATEMENT;break;}
-				if(cur_tok->type==LKEYWORD&&strcmp("while",cur_tok->str.buffer)==0){p->mode=PWHILESTATEMENT;current_node->type=PWHILESTATEMENT;break;}
+				if(cur_tok->type==LKEYWORD&&strcmp("if",cur_tok->str.buffer)==0){p->mode=PIF;current_node->type=PIF;break;}
+				if(cur_tok->type==LKEYWORD&&strcmp("while",cur_tok->str.buffer)==0){p->mode=PWHILE;current_node->type=PWHILE;break;}
 				pushcurrenttoken();
 				//vec_pushta(&current_node->tokens,);
 				break;

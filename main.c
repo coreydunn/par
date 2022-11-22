@@ -45,10 +45,11 @@ int main(int argc,char**argv)
 	{
 		lex_string(&par.lexer,par.input_buffer.buffer);
 		str_free(&par.input_buffer);
-		lex_print(&par.lexer);
+		//lex_print(&par.lexer);
 		parser_parse(&par.parser,&par.lexer.tokens);
 		lex_free(&par.lexer);
-		pnode_print(&par.parser.root,0);
+		//pnode_print(&par.parser.root,0);
+		pnode_print_brief(&par.parser.root,0);
 	}
 
 	// Free memory and leave
@@ -59,7 +60,7 @@ void cleanquit(int exitval)
 {
 	puts("bye");
 	lex_free(&par.lexer);
-	pnode_free(&par.parser.root);
+	parser_free(&par.parser);
 	str_free(&par.input_buffer);
 	exit(exitval);
 }
