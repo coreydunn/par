@@ -223,7 +223,7 @@ void parser_parse(Parser*p,Vec*t)
 				checktypesub(LOPERATOR,LENDSTATEMENT){p->mode=PNONE;break;}
 				checktypesub(LOPERATOR,LLCBRACE){p->mode=PBLOCK;descend(PEXPRESSION);break;}
 				checktypesub(LOPERATOR,LRCBRACE){up();p->mode=PNONE;break;}
-				checktypesub(LOPERATOR,LLPAREN){descend(PEXPRESSION);break;}
+				checktypesub(LOPERATOR,LRPAREN){pushcurrenttoken();++i;descend(PEXPRESSION);break;}
 				pushcurrenttoken();
 				break;
 
