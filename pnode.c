@@ -6,7 +6,7 @@
 #include"tok.h"
 #include"var.h"
 
-char*partype_names[]={"PNONE","PEMPTY","PEXPRESSION","PSTATEMENT","PASSIGNMENT","PIF","PCOMMENT","PBLOCK","PWHILE","PVARDECL"};
+char*partype_names[]={"PNONE","PEMPTY","PEXPRESSION","PSTATEMENT","PASSIGNMENT","PIF","PCOMMENT","PBLOCK","PWHILE","PVARDECL",NULL};
 
 Parser parser_new(void)
 {
@@ -155,6 +155,8 @@ void parser_parse(Parser*p,Vec*t)
 #define descend(m) do{--i;current_node=pnode_pushnode(current_node);current_node->type=m;p->mode=m;}while(0)
 #define pushcurrenttoken() do{vec_pushta(&current_node->tokens,cur_tok->str.buffer);tok_copy_nostr(&((Tok*)current_node->tokens.buffer)[current_node->tokens.size-1],&((Tok*)t->buffer)[i]);}while(0)
 #define up() do{if(current_node&&current_node->parentnode)current_node=current_node->parentnode;}while(0)
+#define checktype(t) if(cur_tok->type==t)
+#define checktypesub(t,s) if(cur_tok->type==t&&cur_tok->subtype==s)
 		switch(p->mode)
 		{
 
@@ -182,7 +184,8 @@ void parser_parse(Parser*p,Vec*t)
 				}
 				break;
 
-			case PCOMMENT:pushcurrenttoken();p->mode=PNONE;break;
+			case PCOMMENT:pushcurrenttoken();printf("COMMENT ok nice: '%s'\n",
+								  cur_tok->str.buffer);p->mode=PNONE;break;
 
 			case PIF:
 				pushcurrenttoken();
@@ -197,33 +200,41 @@ void parser_parse(Parser*p,Vec*t)
 				break;
 
 			case PBLOCK:
-				if(cur_tok->type==LOPERATOR&&cur_tok->subtype==LRCBRACE){up();p->mode=PNONE;break;}
+				checktypesub(LOPERATOR,LRCBRACE){up();p->mode=PNONE;break;}
 				descend(PEXPRESSION);
 				break;
 
 			case PVARDECL:
-				if(cur_tok->type==LOPERATOR&&cur_tok->subtype==LENDSTATEMENT){p->mode=PNONE;break;}
+				checktypesub(LOPERATOR,LENDSTATEMENT){p->mode=PNONE;break;}
 				pushcurrenttoken();
 				break;
 
+				// Default Grammar Rule:
 				// TODO: The default case needs more sophisticated grammar rules
 				// And we should also split cases apart
 			case PEXPRESSION:
 			case PASSIGNMENT:
 			default:
-				if(cur_tok->type==LCOMMENT){p->mode=PCOMMENT;--i;break;}
-				if(cur_tok->type==LOPERATOR&&cur_tok->subtype==LENDSTATEMENT){if(current_node->parentnode->type==PIF)up();
-					p->mode=PNONE;break;}
-				if(cur_tok->type==LOPERATOR&&cur_tok->subtype==LENDSTATEMENT){if(current_node->parentnode->type==PWHILE)up();
-					p->mode=PNONE;break;}
-				if(cur_tok->type==LOPERATOR&&cur_tok->subtype==LASSIGN){p->mode=PASSIGNMENT;current_node->type=PASSIGNMENT;}
-				if(cur_tok->type==LOPERATOR&&cur_tok->subtype==LLCBRACE){p->mode=PBLOCK;current_node->type=PBLOCK;break;}
-				if(cur_tok->type==LOPERATOR&&cur_tok->subtype==LRCBRACE){p->mode=PNONE;up();break;}
-				if(cur_tok->type==LKEYWORD&&strcmp("if",cur_tok->str.buffer)==0){p->mode=PIF;current_node->type=PIF;break;}
-				if(cur_tok->type==LKEYWORD&&strcmp("while",cur_tok->str.buffer)==0){p->mode=PWHILE;current_node->type=PWHILE;break;}
+
+				checktype(LCOMMENT){current_node->type=PCOMMENT;p->mode=PCOMMENT;--i;break;}
+				else checktypesub(LOPERATOR,LENDSTATEMENT){
+					if(current_node->parentnode->type==PIF)up();
+					else if(current_node->parentnode->type==PWHILE)up();
+					p->mode=PNONE;break;
+				}
+				else checktypesub(LOPERATOR,LASSIGN){p->mode=PASSIGNMENT;current_node->type=PASSIGNMENT;}
+				else checktypesub(LOPERATOR,LLCBRACE){p->mode=PBLOCK;current_node->type=PBLOCK;break;}
+				else checktypesub(LOPERATOR,LRCBRACE){p->mode=PNONE;up();break;}
+				else if(cur_tok->type==LKEYWORD){
+					if(strcmp("if",cur_tok->str.buffer)==0){p->mode=PIF;current_node->type=PIF;break;}
+					else if(strcmp("while",cur_tok->str.buffer)==0){p->mode=PWHILE;current_node->type=PWHILE;break;}
+				}
 				pushcurrenttoken();
 				//vec_pushta(&current_node->tokens,);
 				break;
+#undef checktype
+#undef checktypesub
+
 		}
 #undef descend
 #undef pushcurrenttoken
