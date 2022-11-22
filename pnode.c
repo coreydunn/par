@@ -6,7 +6,7 @@
 #include"tok.h"
 #include"var.h"
 
-char*partype_names[]={"PNONE","PEMPTY","PEXPRESSION","PSTATEMENT","PASSIGNMENT","PIF","PCOMMENT","PBLOCK","PWHILE","PVARDECL",NULL};
+char*partype_names[]={"PNONE","PEMPTY","PEXPRESSION","PSTATEMENT","PASSIGNMENT","PIF","PCOMMENT","PBLOCK","PWHILE","PVARDECL","PFUNDECL",NULL};
 
 Parser parser_new(void)
 {
@@ -171,6 +171,7 @@ void parser_parse(Parser*p,Vec*t)
 						if(strcmp("if",cur_tok->str.buffer)==0){++i;descend(PIF);}
 						else if(strcmp("while",cur_tok->str.buffer)==0){++i;descend(PWHILE);}
 						else if(strcmp("let",cur_tok->str.buffer)==0){++i;descend(PVARDECL);}
+						else if(strcmp("fn",cur_tok->str.buffer)==0){++i;descend(PFUNDECL);}
 						break;
 
 					case LOPERATOR:
@@ -218,6 +219,14 @@ void parser_parse(Parser*p,Vec*t)
 				pushcurrenttoken();
 				break;
 
+			case PFUNDECL:
+				checktypesub(LOPERATOR,LENDSTATEMENT){p->mode=PNONE;break;}
+				checktypesub(LOPERATOR,LLCBRACE){p->mode=PBLOCK;descend(PEXPRESSION);break;}
+				checktypesub(LOPERATOR,LRCBRACE){up();p->mode=PNONE;break;}
+				checktypesub(LOPERATOR,LLPAREN){descend(PEXPRESSION);break;}
+				pushcurrenttoken();
+				break;
+
 				// Default Grammar Rule:
 				// TODO: The default case needs more sophisticated grammar rules
 				// And we should also split cases apart
@@ -238,6 +247,7 @@ void parser_parse(Parser*p,Vec*t)
 					if(strcmp("if",cur_tok->str.buffer)==0){p->mode=PIF;current_node->type=PIF;break;}
 					else if(strcmp("while",cur_tok->str.buffer)==0){p->mode=PWHILE;current_node->type=PWHILE;break;}
 					else if(strcmp("let",cur_tok->str.buffer)==0){p->mode=PVARDECL;current_node->type=PVARDECL;break;}
+					else if(strcmp("fn",cur_tok->str.buffer)==0){p->mode=PFUNDECL;current_node->type=PFUNDECL;break;}
 				}
 				pushcurrenttoken();
 				//vec_pushta(&current_node->tokens,);
