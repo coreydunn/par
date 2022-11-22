@@ -151,7 +151,6 @@ void parser_parse(Parser*p,Vec*t)
 	{
 		if(!current_node)current_node=&p->root;
 		cur_tok=((Tok*)t->buffer)+i;
-		//printf("%lu ",i);
 #define descend(m) do{--i;current_node=pnode_pushnode(current_node);current_node->type=m;p->mode=m;}while(0)
 #define pushcurrenttoken() do{vec_pushta(&current_node->tokens,cur_tok->str.buffer);tok_copy_nostr(&((Tok*)current_node->tokens.buffer)[current_node->tokens.size-1],&((Tok*)t->buffer)[i]);}while(0)
 #define up() do{if(current_node&&current_node->parentnode)current_node=current_node->parentnode;}while(0)
@@ -175,11 +174,21 @@ void parser_parse(Parser*p,Vec*t)
 						break;
 
 					case LOPERATOR:
-						if(cur_tok->subtype==LLCBRACE){p->mode=PBLOCK;descend(PBLOCK);}
-						else if(cur_tok->subtype==LRCBRACE){up();}
+						if(cur_tok->subtype==LLCBRACE){++i;p->mode=PNONE;descend(PBLOCK);}
+						else if(cur_tok->subtype==LRCBRACE){
+							if(current_node->parentnode==NULL)
+								fprintf(stderr,"error: unmatched '}'\n");
+							up();
+						}
 						break;
 
+						// Expressions
 					case LCOMMENT:descend(PCOMMENT);break;
+					case LIDENTIFIER:
+					case LINTEGER:
+					case LFLOAT:
+							descend(PEXPRESSION);break;
+
 					default:descend(PEXPRESSION);break;
 				}
 				break;
@@ -227,6 +236,7 @@ void parser_parse(Parser*p,Vec*t)
 				else if(cur_tok->type==LKEYWORD){
 					if(strcmp("if",cur_tok->str.buffer)==0){p->mode=PIF;current_node->type=PIF;break;}
 					else if(strcmp("while",cur_tok->str.buffer)==0){p->mode=PWHILE;current_node->type=PWHILE;break;}
+					else if(strcmp("let",cur_tok->str.buffer)==0){p->mode=PVARDECL;current_node->type=PVARDECL;break;}
 				}
 				pushcurrenttoken();
 				//vec_pushta(&current_node->tokens,);
