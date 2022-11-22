@@ -7,7 +7,7 @@
 
 int main(int argc,char**argv)
 {
-	State state=state_new();
+	state=state_new();
 
 	// Ensure cleanup is called
 	signal(SIGINT,sighandle);
@@ -17,7 +17,7 @@ int main(int argc,char**argv)
 	{
 		state.infile=fopen(argv[1],"r");
 		if(!state.infile)
-			fprintf(stderr,"error: failed to open infile '%s'\n",argv[1]);
+			err_log(&state.errors,"failed to open infile '%s'\n",argv[1]);
 	}
 
 	// Read input file into buffer
@@ -44,6 +44,8 @@ int main(int argc,char**argv)
 		//pnode_print(&state.parser.root,0);
 		pnode_print_brief(&state.parser.root,0);
 	}
+
+	state_print_errors(&state);
 
 	// Free memory and leave
 	state_free(&state);

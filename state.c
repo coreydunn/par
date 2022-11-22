@@ -6,23 +6,23 @@ State state;
 
 void cleanquit(int exitval)
 {
-	puts("bye");
-	state_free(&state);
-	exit(exitval);
+		puts("bye");
+			state_free(&state);
+				exit(exitval);
 }
 
 void sighandle(int sig)
 {
-	if(sig==SIGINT)
-		cleanquit(0);
+		if(sig==SIGINT)
+					cleanquit(0);
 }
 
 State state_new(void)
 {
 	State st=(State){
+		.lexer=lex_new(),
 		.parser=parser_new(),
 		.input_buffer=str_new(),
-		.lexer=lex_new(),
 		.errors=vec_new(sizeof(Err)),
 		.infile=stdin,
 	};
@@ -37,7 +37,15 @@ void state_free(State*st)
 		return;
 	}
 
-	lex_free(&state.lexer);
-	parser_free(&state.parser);
-	str_free(&state.input_buffer);
+	for(size_t i=0;i<st->errors.size;++i)
+		err_free(&((Err*)st->errors.buffer)[i]);
+	vec_free(&st->errors);
+	lex_free(&st->lexer);
+	parser_free(&st->parser);
+	str_free(&st->input_buffer);
+}
+
+void state_print_errors(State*st)
+{
+	err_print_vec(&st->errors);
 }

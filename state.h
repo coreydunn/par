@@ -11,6 +11,7 @@
 #include"str.h"
 #include"vec.h"
 #include"var.h"
+#include"err.h"
 
 // State for par program
 typedef struct State
@@ -22,10 +23,11 @@ typedef struct State
 	FILE*infile;
 } State;
 
-extern State par;
+extern State state;
 
 State state_new(void);
 void state_free(State*st);
+void state_print_errors(State*st);
 
 void cleanquit(int exitval);
 void sighandle(int sig);

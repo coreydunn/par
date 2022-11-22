@@ -7,6 +7,7 @@
 #include"lex.h"
 #include"str.h"
 #include"reg.h"
+#include"err.h"
 
 char*lextype_names[]={"LNONE","LIDENTIFIER","LINTEGER","LFLOAT","LSTRING","LOPERATOR","LKEYWORD","LCOMMENT",NULL};
 char*lextype_colors[]={"\033[0m","\033[0m","\033[36m","\033[35m","\033[32m","\033[0m","\033[33m","\033[34m"};
@@ -88,6 +89,7 @@ void lex_string(Lexer*l,char*s)
 				initmatch(operators,LOPERATOR,true) else
 				initmatch("#",LCOMMENT,true) else
 				if(strchr(" \t\n",s[i])){if(s[i]=='\n')++current_line;continue;} else
+					// TODO: replace this with proper error printer
 				fprintf(stderr,"error: %lu: unrecognized character '%c' (%#x)\n",current_line,((s[i]>32)?(s[i]):(' ')),s[i]);
 				//initmatch(" \t\n",LNONE,false)
 				break;

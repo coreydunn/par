@@ -1,6 +1,6 @@
 CFLAGS=   -Wfatal-errors -Wall -Wextra
 LDFLAGS=  -s
-OBJS=     str.o tok.o vec.o lex.o pnode.o reg.o var.o state.o
+OBJS=     str.o tok.o vec.o lex.o pnode.o reg.o var.o state.o err.o
 
 all: par
 %.o: %.c %.h
