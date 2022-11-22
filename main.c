@@ -17,7 +17,7 @@ int main(int argc,char**argv)
 	{
 		state.infile=fopen(argv[1],"r");
 		if(!state.infile)
-			err_log(&state.errors,"failed to open infile '%s'\n",argv[1]);
+			err_log(&state.errors,"failed to open infile '%s'",argv[1]);
 	}
 
 	// Read input file into buffer

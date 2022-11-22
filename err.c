@@ -86,6 +86,18 @@ void err_log(Vec*v,char*fmt,...)
 					str_append(&str,sbuffer);
 					break;
 
+				case 'x':
+					ibuffer=va_arg(va,uint32_t);
+					sprintf(sbuffer,"%#x",ibuffer);
+					str_append(&str,sbuffer);
+					break;
+
+				case 'c':
+					sbuffer[0]=va_arg(va,int);
+					sbuffer[1]=0;
+					str_append(&str,sbuffer);
+					break;
+
 				case 's':
 					strptr=va_arg(va,char*);
 					str_append(&str,strptr);

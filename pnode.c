@@ -5,6 +5,7 @@
 #include"pnode.h"
 #include"tok.h"
 #include"var.h"
+#include"state.h"
 
 char*partype_names[]={"PNONE","PEMPTY","PEXPRESSION","PSTATEMENT","PASSIGNMENT","PIF","PCOMMENT","PBLOCK","PWHILE","PVARDECL","PFUNDECL",NULL};
 
@@ -178,7 +179,7 @@ void parser_parse(Parser*p,Vec*t)
 						if(cur_tok->subtype==LLCBRACE){++i;p->mode=PNONE;descend(PBLOCK);}
 						else if(cur_tok->subtype==LRCBRACE){
 							if(current_node->parentnode==NULL)
-								fprintf(stderr,"error: unmatched '}'\n");
+								err_log(&state.errors,"unmatched '}'");
 							up();
 						}
 						break;
