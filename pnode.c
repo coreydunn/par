@@ -184,8 +184,7 @@ void parser_parse(Parser*p,Vec*t)
 				}
 				break;
 
-			case PCOMMENT:pushcurrenttoken();printf("COMMENT ok nice: '%s'\n",
-								  cur_tok->str.buffer);p->mode=PNONE;break;
+			case PCOMMENT:pushcurrenttoken();p->mode=PNONE;break;
 
 			case PIF:
 				pushcurrenttoken();
