@@ -5,7 +5,7 @@
 #include"pnode.h"
 #include"tok.h"
 
-char*partype_names[]={"PNONE","PEMPTY","PEXPRESSION","PSTATEMENT","PASSIGNMENT","PIFSTATEMENT","PDECLARATION","PCOMMENT","PBLOCK"};
+char*partype_names[]={"PNONE","PEMPTY","PEXPRESSION","PSTATEMENT","PASSIGNMENT","PIFSTATEMENT","PDECLARATION","PCOMMENT","PBLOCK","PWHILESTATEMENT"};
 
 Parser parser_new(void)
 {
@@ -149,14 +149,17 @@ void parser_parse(Parser*p,Vec*t)
 		{
 
 			case PNONE:
-				while(current_node->parentnode&&current_node->parentnode->type==PIFSTATEMENT)
+				while(current_node->parentnode&&(current_node->parentnode->type==PIFSTATEMENT||
+						current_node->parentnode->type==PWHILESTATEMENT))
 					up();
 				up();
 				switch(cur_tok->type)
 				{
 
 					case LKEYWORD:
-						if(strcmp("if",cur_tok->str.buffer)==0){++i;descend(PIFSTATEMENT);}break;
+						if(strcmp("if",cur_tok->str.buffer)==0){++i;descend(PIFSTATEMENT);}
+						else if(strcmp("while",cur_tok->str.buffer)==0){++i;descend(PWHILESTATEMENT);}
+						break;
 
 					case LOPERATOR:
 						if(cur_tok->subtype==LLCBRACE){p->mode=PBLOCK;descend(PBLOCK);}
@@ -176,6 +179,12 @@ void parser_parse(Parser*p,Vec*t)
 					++i;p->mode=PNONE;descend(PEXPRESSION);break;}
 				break;
 
+			case PWHILESTATEMENT:
+				pushcurrenttoken();
+				if(cur_tok->type==LOPERATOR&&cur_tok->subtype==LRPAREN){
+					++i;p->mode=PNONE;descend(PEXPRESSION);break;}
+				break;
+
 			case PBLOCK:
 				if(cur_tok->type==LOPERATOR&&cur_tok->subtype==LRCBRACE){up();p->mode=PNONE;break;}
 				descend(PEXPRESSION);
@@ -189,10 +198,13 @@ void parser_parse(Parser*p,Vec*t)
 				if(cur_tok->type==LCOMMENT){p->mode=PCOMMENT;--i;break;}
 				if(cur_tok->type==LOPERATOR&&cur_tok->subtype==LENDSTATEMENT){if(current_node->parentnode->type==PIFSTATEMENT)up();
 					p->mode=PNONE;break;}
+				if(cur_tok->type==LOPERATOR&&cur_tok->subtype==LENDSTATEMENT){if(current_node->parentnode->type==PWHILESTATEMENT)up();
+					p->mode=PNONE;break;}
 				if(cur_tok->type==LOPERATOR&&cur_tok->subtype==LASSIGN){p->mode=PASSIGNMENT;current_node->type=PASSIGNMENT;}
 				if(cur_tok->type==LOPERATOR&&cur_tok->subtype==LLCBRACE){p->mode=PBLOCK;current_node->type=PBLOCK;break;}
 				if(cur_tok->type==LOPERATOR&&cur_tok->subtype==LRCBRACE){p->mode=PNONE;up();break;}
 				if(cur_tok->type==LKEYWORD&&strcmp("if",cur_tok->str.buffer)==0){p->mode=PIFSTATEMENT;current_node->type=PIFSTATEMENT;break;}
+				if(cur_tok->type==LKEYWORD&&strcmp("while",cur_tok->str.buffer)==0){p->mode=PWHILESTATEMENT;current_node->type=PWHILESTATEMENT;break;}
 				pushcurrenttoken();
 				//vec_pushta(&current_node->tokens,);
 				break;
