@@ -149,6 +149,8 @@ void parser_parse(Parser*p,Vec*t)
 		{
 
 			case PNONE:
+				while(current_node->parentnode&&current_node->parentnode->type==PIFSTATEMENT)
+					up();
 				up();
 				switch(cur_tok->type)
 				{
@@ -185,7 +187,8 @@ void parser_parse(Parser*p,Vec*t)
 			case PASSIGNMENT:
 			default:
 				if(cur_tok->type==LCOMMENT){p->mode=PCOMMENT;--i;break;}
-				if(cur_tok->type==LOPERATOR&&cur_tok->subtype==LENDSTATEMENT){p->mode=PNONE;break;}
+				if(cur_tok->type==LOPERATOR&&cur_tok->subtype==LENDSTATEMENT){if(current_node->parentnode->type==PIFSTATEMENT)up();
+					p->mode=PNONE;break;}
 				if(cur_tok->type==LOPERATOR&&cur_tok->subtype==LASSIGN){p->mode=PASSIGNMENT;current_node->type=PASSIGNMENT;}
 				if(cur_tok->type==LOPERATOR&&cur_tok->subtype==LLCBRACE){p->mode=PBLOCK;current_node->type=PBLOCK;}
 				if(cur_tok->type==LOPERATOR&&cur_tok->subtype==LRCBRACE){p->mode=PNONE;up();break;}
