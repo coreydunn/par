@@ -190,7 +190,7 @@ void parser_parse(Parser*p,Vec*t)
 				if(cur_tok->type==LOPERATOR&&cur_tok->subtype==LENDSTATEMENT){if(current_node->parentnode->type==PIFSTATEMENT)up();
 					p->mode=PNONE;break;}
 				if(cur_tok->type==LOPERATOR&&cur_tok->subtype==LASSIGN){p->mode=PASSIGNMENT;current_node->type=PASSIGNMENT;}
-				if(cur_tok->type==LOPERATOR&&cur_tok->subtype==LLCBRACE){p->mode=PBLOCK;current_node->type=PBLOCK;}
+				if(cur_tok->type==LOPERATOR&&cur_tok->subtype==LLCBRACE){p->mode=PBLOCK;current_node->type=PBLOCK;break;}
 				if(cur_tok->type==LOPERATOR&&cur_tok->subtype==LRCBRACE){p->mode=PNONE;up();break;}
 				if(cur_tok->type==LKEYWORD&&strcmp("if",cur_tok->str.buffer)==0){p->mode=PIFSTATEMENT;current_node->type=PIFSTATEMENT;break;}
 				pushcurrenttoken();
