@@ -18,8 +18,14 @@ typedef struct State
 	Lexer lexer;
 	Parser parser;
 	Str input_buffer;
+	Vec errors;
 	FILE*infile;
 } State;
+
+extern State par;
+
+State state_new(void);
+void state_free(State*st);
 
 void cleanquit(int exitval);
 void sighandle(int sig);
