@@ -49,7 +49,7 @@ void str_assign(Str*s,char*c)
 	if(!s)return;
 	n=strlen(c)+1;
 	if(s->capacity<n)
-		str_grow(s,n);
+		str_grow(s,n+STRDEFSIZE);
 	strcpy(s->buffer,c);
 	s->size=n-1;
 }
@@ -67,7 +67,7 @@ void str_append(Str*s,char*c)
 
 	n=strlen(c)+1;
 	if(s->capacity<s->size+n)
-		str_grow(s,s->size+n);
+		str_grow(s,s->size+n+STRDEFSIZE);
 	if(!s->buffer)
 		return;
 	strcat(s->buffer,c);
