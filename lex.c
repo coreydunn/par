@@ -90,7 +90,7 @@ void lex_string(Lexer*l,char*s)
 				initmatch(operators,LOPERATOR,true) else
 				initmatch("#",LCOMMENT,true) else
 				if(strchr(" \t\n",s[i])){if(s[i]=='\n')++current_line;continue;} else
-				err_log(&state.errors,"%u: unrecognized character '%c' (%x)",current_line,((s[i]>32)?(s[i]):(' ')),s[i]);
+				err_log("%u: unrecognized character '%c' (%x)",current_line,((s[i]>32)?(s[i]):(' ')),s[i]);
 				//initmatch(" \t\n",LNONE,false)
 				break;
 

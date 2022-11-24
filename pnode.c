@@ -179,7 +179,7 @@ void parser_parse(Parser*p,Vec*t)
 						if(cur_tok->subtype==LLCBRACE){++i;p->mode=PNONE;descend(PBLOCK);}
 						else if(cur_tok->subtype==LRCBRACE){
 							if(current_node->parentnode==NULL)
-								err_log(&state.errors,"unmatched '}'");
+								err_log("unmatched '}'");
 							up();
 						}
 						break;

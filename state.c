@@ -23,7 +23,6 @@ State state_new(void)
 		.lexer=lex_new(),
 		.parser=parser_new(),
 		.input_buffer=str_new(),
-		.errors=vec_new(sizeof(Err)),
 		.infile=stdin,
 	};
 	return st;
@@ -37,15 +36,7 @@ void state_free(State*st)
 		return;
 	}
 
-	for(size_t i=0;i<st->errors.size;++i)
-		err_free(&((Err*)st->errors.buffer)[i]);
-	vec_free(&st->errors);
 	lex_free(&st->lexer);
 	parser_free(&st->parser);
 	str_free(&st->input_buffer);
-}
-
-void state_print_errors(State*st)
-{
-	err_print_vec(&st->errors);
 }

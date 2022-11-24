@@ -17,7 +17,7 @@ int main(int argc,char**argv)
 	{
 		state.infile=fopen(argv[1],"r");
 		if(!state.infile)
-			err_log(&state.errors,"failed to open infile '%s'",argv[1]);
+			err_log("failed to open infile '%s'",argv[1]);
 	}
 
 	// Read input file into buffer
@@ -41,11 +41,9 @@ int main(int argc,char**argv)
 		//lex_print(&state.lexer);
 		parser_parse(&state.parser,&state.lexer.tokens);
 		lex_free(&state.lexer);
-		//pnode_print(&state.parser.root,0);
-		pnode_print_brief(&state.parser.root,0);
+		pnode_print(&state.parser.root,0);
+		//pnode_print_brief(&state.parser.root,0);
 	}
-
-	state_print_errors(&state);
 
 	// Free memory and leave
 	state_free(&state);
