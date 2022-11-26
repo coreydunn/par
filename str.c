@@ -117,3 +117,69 @@ void str_randomize(Str*s)
 	}
 	s->buffer[i]='\0';
 }
+
+int search(int*a,int n,int v)
+{
+	int b=0,e=n-1,m=(e-b)/2;
+
+	do
+	{
+
+		if(a[m]==v)
+			return m;
+
+		if(a[m]<v)
+		{
+			if(e==b){m=-1;break;}
+			else b=m+1,m=(e-b)/2+b;
+		}
+		else if(a[m]>v)
+		{
+			if(e==b){m=-1;break;}
+			else e=m-1,m=(e-b)/2+b;
+		}
+
+	}while(true);
+
+	return m;
+}
+
+// Binary search of array of char pointers
+int cstr_search(char**a,int n,char*v)
+{
+	int b=0,e=n-1,m=(e-b)/2;
+
+	do
+	{
+
+		if(strcmp(a[m],v)==0)
+			return m;
+
+		if(strcmp(a[m],v)<0)
+		{
+			if(e<=b){m=-1;break;}
+			else b=m+1,m=(e-b)/2+b;
+		}
+
+		else if(strcmp(a[m],v)>0)
+		{
+			if(e<=b){m=-1;break;}
+			else e=m-1,m=(e-b)/2+b;
+		}
+
+	}while(true);
+
+	return -1;
+}
+
+// Sort array of char pointers
+void cstr_sort(char**a,size_t n)
+{
+	char*t;
+	for(size_t i=0;i<n-1;++i)
+		for(size_t j=i+1;j<n;++j)
+			if(strcmp(a[i],a[j])>0)
+				t=a[i],
+				a[i]=a[j],
+				a[j]=t;
+}

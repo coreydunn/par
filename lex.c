@@ -14,7 +14,7 @@ char*lextype_names[]={"LNONE","LIDENTIFIER","LINTEGER","LFLOAT","LSTRING","LOPER
 char*lextype_colors[]={"\033[0m","\033[0m","\033[36m","\033[35m","\033[32m","\033[0m","\033[33m","\033[34m"};
 char*lexsubtype_names[]={"LENDSTATEMENT","LASSIGN","LLPAREN","LRPAREN","LLCBRACE","LRCBRACE",NULL};
 static char*operators="-+*/=;(),.{}<>";
-static char*keywords[]={"for","if","while","do","true","false","let","fn"};
+static char*keywords[]={"do","false","fn","for","if","let","true","while",};
 
 Lexer lex_new(void)
 {
