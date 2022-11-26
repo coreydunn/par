@@ -12,6 +12,7 @@
 #include"vec.h"
 #include"var.h"
 #include"err.h"
+#include"x86_64.h"
 
 // State for par program
 typedef struct State
