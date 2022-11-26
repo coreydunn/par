@@ -157,6 +157,7 @@ void parser_parse(Parser*p,Vec*t)
 #define up() do{if(current_node&&current_node->parentnode)current_node=current_node->parentnode;}while(0)
 #define checktype(t) if(cur_tok->type==t)
 #define checktypesub(t,s) if(cur_tok->type==t&&cur_tok->subtype==s)
+#define globalcode() do{if(current_node->parentnode==NULL)err_log("%u: statement not inside function declaration",cur_tok->line);}while(0)
 		switch(p->mode)
 		{
 
@@ -169,14 +170,19 @@ void parser_parse(Parser*p,Vec*t)
 				{
 
 					case LKEYWORD:
-						if(strcmp("if",cur_tok->str.buffer)==0){++i;descend(PIF);}
-						else if(strcmp("while",cur_tok->str.buffer)==0){++i;descend(PWHILE);}
-						else if(strcmp("let",cur_tok->str.buffer)==0){++i;descend(PVARDECL);}
+						if(strcmp("if",cur_tok->str.buffer)==0){globalcode();++i;descend(PIF);}
+						else if(strcmp("while",cur_tok->str.buffer)==0){globalcode();++i;descend(PWHILE);}
+						else if(strcmp("let",cur_tok->str.buffer)==0){globalcode();++i;descend(PVARDECL);}
 						else if(strcmp("fn",cur_tok->str.buffer)==0){++i;descend(PFUNDECL);}
 						break;
 
 					case LOPERATOR:
-						if(cur_tok->subtype==LLCBRACE){++i;p->mode=PNONE;descend(PBLOCK);}
+						if(cur_tok->subtype==LLCBRACE)
+						{
+							if(!current_node->parentnode)
+								err_log("%u: code block does not have parent",cur_tok->line);
+							++i;p->mode=PNONE;descend(PBLOCK);
+						}
 						else if(cur_tok->subtype==LRCBRACE){
 							if(current_node->parentnode==NULL)
 								err_log("%u: unmatched '}'",cur_tok->line);
@@ -189,9 +195,12 @@ void parser_parse(Parser*p,Vec*t)
 					case LIDENTIFIER:
 					case LINTEGER:
 					case LFLOAT:
+					default:
+						{
+							globalcode();
 							descend(PEXPRESSION);break;
+						}
 
-					default:descend(PEXPRESSION);break;
 				}
 				break;
 
@@ -260,5 +269,6 @@ void parser_parse(Parser*p,Vec*t)
 #undef descend
 #undef pushcurrenttoken
 #undef up
+#undef globalcode
 	}
 }
