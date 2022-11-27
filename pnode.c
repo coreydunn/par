@@ -7,7 +7,7 @@
 #include"var.h"
 #include"state.h"
 
-char*partype_names[]={"PNONE","PEMPTY","PEXPRESSION","PSTATEMENT","PASSIGNMENT","PIF","PCOMMENT","PBLOCK","PWHILE","PVARDECL","PFUNDECL",NULL};
+char*partype_names[]={"PNONE","PEMPTY","PEXPRESSION","PSTATEMENT","PASSIGNMENT","PIF","PCOMMENT","PBLOCK","PWHILE","PVARDECL","PFUNDECL","PRET",NULL};
 
 Parser parser_new(void)
 {
@@ -171,6 +171,7 @@ void parser_parse(Parser*p,Vec*t)
 
 					case LKEYWORD:
 						if(strcmp("if",cur_tok->str.buffer)==0){globalcode();++i;descend(PIF);}
+						else if(strcmp("ret",cur_tok->str.buffer)==0){globalcode();++i;descend(PRET);}
 						else if(strcmp("while",cur_tok->str.buffer)==0){globalcode();++i;descend(PWHILE);}
 						else if(strcmp("let",cur_tok->str.buffer)==0){globalcode();++i;descend(PVARDECL);}
 						else if(strcmp("fn",cur_tok->str.buffer)==0){++i;descend(PFUNDECL);}

@@ -14,24 +14,36 @@ void gen_x86_64(PNode*pn)
 			break;
 
 		case PVARDECL:
-			printf("xor eax,eax ;%s\n",tokens[0].str.buffer);
+			printf("\txor eax,eax ;%s\n",tokens[0].str.buffer);
+			break;
+
+		case PRET:
+				if(pn->tokens.size>1)
+					printf("\tmov eax,0 ;%s\n",tokens[1].str.buffer);
+				printf("\tret\n");
 			break;
 
 		case PIF:
 				// if x == 7
 				if(pn->tokens.size>1)
-					printf("cmp eax,0 ;%s\n",tokens[1].str.buffer);
-				printf("jz .L01\n");
+					printf("\tcmp eax,0 ;%s\n",tokens[1].str.buffer);
+				printf("\tjz .L01\n");
+			break;
+
+		case PWHILE:
+				if(pn->tokens.size>1)
+					printf("\tcmp eax,0 ;%s\n",tokens[1].str.buffer);
+				printf("\tjz .L01\n");
 			break;
 
 		case PCOMMENT:
-				printf(";%s\n",tokens[0].str.buffer);
+				printf("\t;%s\n",tokens[0].str.buffer);
 			break;
 
 		default:
 			if(pn->tokens.size>0)
 			{
-				printf("%s:",partype_names[pn->type]);
+				printf(";PNODE ID: %s ",partype_names[pn->type]);
 				for(size_t i=0;i<pn->tokens.size;++i)
 				{
 					Tok tok=tokens[i];
