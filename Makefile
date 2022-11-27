@@ -7,5 +7,10 @@ all: par
 	$(CC) $< -c $(CFLAGS)
 par: main.o $(OBJS)
 	$(CC) $^ -o $@ $(LDFLAGS)
+install_vimfiles:
+	mkdir -p ~/.vim/ftdetect
+	mkdir -p ~/.vim/syntax
+	cp ./vimfiles/syntax/bob.vim ~/.vim/syntax/
+	cp ./vimfiles/ftdetect/bob.vim ~/.vim/ftdetect/
 clean:
 	$(RM) *.o $(OBJS) par
