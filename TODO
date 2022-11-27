@@ -27,3 +27,4 @@ Code Generator
 
 * Reverse Polish Notation expression evaluation
 * Handle state for source language (variables, functions, labels, etc.)
+* State for code generation
