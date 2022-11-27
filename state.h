@@ -22,6 +22,7 @@ typedef struct State
 	Str input_buffer;
 	Vec errors;
 	FILE*infile;
+	FILE*outfile;
 } State;
 
 extern State state;
