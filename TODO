@@ -22,3 +22,8 @@ Parser
 * Store parse data in grammar tree [DONE]
 * Define grammatical structures
 	- Recursive statements (e.g., if, while...) [DONE]
+
+Code Generator
+
+* Reverse Polish Notation expression evaluation
+* Handle state for source language (variables, functions, labels, etc.)

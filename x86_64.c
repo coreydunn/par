@@ -17,6 +17,13 @@ void gen_x86_64(PNode*pn)
 			printf("xor eax,eax ;%s\n",tokens[0].str.buffer);
 			break;
 
+		case PIF:
+				// if x == 7
+				if(pn->tokens.size>1)
+					printf("cmp eax,0 ;%s\n",tokens[1].str.buffer);
+				printf("jz .L01\n");
+			break;
+
 		case PCOMMENT:
 				printf(";%s\n",tokens[0].str.buffer);
 			break;
