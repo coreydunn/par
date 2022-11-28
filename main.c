@@ -45,6 +45,17 @@ int main(int argc,char**argv)
 		//pnode_print_brief(&state.parser.root,0);
 	}
 
+	{
+		state.outfile=fopen("a.out","w");
+		if(!state.outfile)state.outfile=stdout;
+		if(!state.outfile){err_log("cannot open outfile '%s'","a.out");state.outfile=stdout;}
+
+		gen_x86_64(&state.parser.root,state.outfile);
+
+		if(state.outfile)
+			fclose(state.outfile);
+	}
+
 	// Free memory and leave
 	state_free(&state);
 	cleanquit(0);

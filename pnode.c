@@ -34,6 +34,7 @@ PNode pnode_new(void)
 		.tokens=vec_new(sizeof(Tok)), // Empty Vec
 		.parentnode=NULL,
 		.type=PEMPTY,
+		.firstline=0,
 	};
 
 	return n;
@@ -152,7 +153,7 @@ void parser_parse(Parser*p,Vec*t)
 	{
 		if(!current_node)current_node=&p->root;
 		cur_tok=((Tok*)t->buffer)+i;
-#define descend(m) do{--i;current_node=pnode_pushnode(current_node);current_node->type=m;p->mode=m;}while(0)
+#define descend(m) do{--i;current_node=pnode_pushnode(current_node);current_node->type=m;p->mode=m;current_node->firstline=cur_tok->line;}while(0)
 #define pushcurrenttoken() do{vec_pushta(&current_node->tokens,cur_tok->str.buffer);tok_copy_nostr(&((Tok*)current_node->tokens.buffer)[current_node->tokens.size-1],&((Tok*)t->buffer)[i]);}while(0)
 #define up() do{if(current_node&&current_node->parentnode)current_node=current_node->parentnode;}while(0)
 #define checktype(t) if(cur_tok->type==t)
@@ -258,6 +259,7 @@ void parser_parse(Parser*p,Vec*t)
 					if(strcmp("if",cur_tok->str.buffer)==0){p->mode=PIF;current_node->type=PIF;break;}
 					else if(strcmp("while",cur_tok->str.buffer)==0){p->mode=PWHILE;current_node->type=PWHILE;break;}
 					else if(strcmp("let",cur_tok->str.buffer)==0){p->mode=PVARDECL;current_node->type=PVARDECL;break;}
+					else if(strcmp("ret",cur_tok->str.buffer)==0){p->mode=PRET;current_node->type=PRET;break;}
 					else if(strcmp("fn",cur_tok->str.buffer)==0){p->mode=PFUNDECL;current_node->type=PFUNDECL;break;}
 				}
 				pushcurrenttoken();

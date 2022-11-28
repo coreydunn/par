@@ -31,6 +31,7 @@ typedef struct PNode
 	Vec tokens;
 	Vec pnodes;
 	uint32_t type;
+	size_t firstline;
 } PNode;
 
 typedef struct Parser

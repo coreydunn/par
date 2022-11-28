@@ -5,6 +5,7 @@
 
 void gen_x86_64(PNode*pn,FILE*file)
 {
+	size_t labelno=1;
 	Tok*tokens=(Tok*)pn->tokens.buffer;
 
 	if(!file)return;
@@ -17,32 +18,49 @@ void gen_x86_64(PNode*pn,FILE*file)
 			break;
 
 		case PVARDECL:
+			if(pn->tokens.size>1)
+			{
+				if(tokens[1].type!=LOPERATOR||(strcmp(tokens[1].str.buffer,"=")))
+					err_log("%u: expected either ';' or '='",tokens[1].line);
+			}
+			else if(pn->tokens.size==0)
+				err_log("%u: expected identifier",pn->firstline);
+
+
 			if(pn->tokens.size>2)
 			{
-				if(tokens[1].str.buffer[0]=='=')
+				if(tokens[1].type==LOPERATOR&&tokens[1].str.buffer[0]=='=')
 					fprintf(file,"\tmov eax,%s ;%s\n",tokens[2].str.buffer,tokens[0].str.buffer);
 			}
-			else
+			else if(pn->tokens.size>0)
+			{
 				fprintf(file,"\txor eax,eax ;%s\n",tokens[0].str.buffer);
+			}
 			break;
 
 		case PRET:
-				if(pn->tokens.size>1)
-					fprintf(file,"\tmov eax,0 ;%s\n",tokens[1].str.buffer);
+				if(pn->tokens.size>0)
+				{
+					if(tokens[0].type!=LINTEGER)
+						err_log("%u: returning non-integer",tokens[0].line);
+					else
+						fprintf(file,"\tmov eax,%s\n",tokens[0].str.buffer);
+				}
 				fprintf(file,"\tret\n");
 			break;
 
 		case PIF:
-				// if x == 7
 				if(pn->tokens.size>1)
 					fprintf(file,"\tcmp eax,0 ;%s\n",tokens[1].str.buffer);
-				fprintf(file,"\tjz .L01\n");
+				fprintf(file,"\tjz .L%02lu\n",++labelno);
+				fprintf(file,".L%02lu\n",labelno);
 			break;
 
 		case PWHILE:
 				if(pn->tokens.size>1)
 					fprintf(file,"\tcmp eax,0 ;%s\n",tokens[1].str.buffer);
-				fprintf(file,"\tjz .L01\n");
+				fprintf(file,"\tjz .L%02lu\n",++labelno);
+				fprintf(file,".L%02lu\n",labelno);
 			break;
 
 		case PCOMMENT:
