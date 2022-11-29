@@ -46,7 +46,14 @@ int main(int argc,char**argv)
 	}
 
 	{
-		state.outfile=fopen("a.out","w");
+	  Str fn=str_new();
+	  if(state.infile!=stdin)
+	    fn=str_basename(argv[1]);
+	  else
+	    str_assign(&fn,"a.asm");
+	  str_append(&fn,".asm");
+	  
+		state.outfile=fopen(fn.buffer,"w");
 		if(!state.outfile)state.outfile=stdout;
 		if(!state.outfile){err_log("cannot open outfile '%s'","a.out");state.outfile=stdout;}
 
@@ -54,6 +61,7 @@ int main(int argc,char**argv)
 
 		if(state.outfile)
 			fclose(state.outfile);
+		str_free(&fn);
 	}
 
 	// Free memory and leave

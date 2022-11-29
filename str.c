@@ -183,3 +183,26 @@ void cstr_sort(char**a,size_t n)
 				a[i]=a[j],
 				a[j]=t;
 }
+
+Str str_basename(char*c)
+{
+  Str s=str_new();
+  char*p=NULL,*t=NULL;
+  if(!c)return s;
+  
+  str_assign(&s,c);
+  if(!s.buffer)return s;
+  p=s.buffer;
+  t=p;
+
+  do
+    {
+      p=t;
+      t=strchr(p+1,'.');
+    }
+  while(t);
+
+  if(p)
+    *p='\0';
+  return s;
+}
