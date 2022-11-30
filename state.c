@@ -6,7 +6,6 @@ State state;
 
 void cleanquit(int exitval)
 {
-	puts("bye");
 	state_free(&state);
 	exit(exitval);
 }

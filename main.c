@@ -5,6 +5,8 @@
 #include<unistd.h>
 #include"state.h"
 
+#define HELPMSG "usage: par [-tpb] [--help] [FILES]"
+
 int main(int argc,char**argv)
 {
 	bool showparsetree=false;
@@ -29,7 +31,7 @@ int main(int argc,char**argv)
 				// LONG OPTIONS
 				if(strcmp("--help",argv[i])==0)
 				{
-					puts("help yourself");
+					puts(HELPMSG);
 					cleanquit(0);
 				}
 
