@@ -10,7 +10,7 @@
 #include"reg.h"
 #include"str.h"
 #include"vec.h"
-#include"var.h"
+#include"mem.h"
 #include"err.h"
 #include"x86_64.h"
 

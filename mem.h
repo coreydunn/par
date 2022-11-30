@@ -5,13 +5,13 @@
 #include<stdlib.h>
 #include"str.h"
 
-enum VARTYPE {VI32, VU32, VSTR, };
+enum MEMTYPE {VI32, VU32, VSTR, };
 
-typedef struct Var
+typedef struct Mem
 {
 	Str name;
 	size_t type;
-} Var;
+} Mem;
 
-Var var_new(void);
-void var_free(Var*v);
+Mem mem_new(void);
+void mem_free(Mem*v);

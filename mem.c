@@ -1,15 +1,15 @@
-#include"var.h"
+#include"mem.h"
 
-Var var_new(void)
+Mem mem_new(void)
 {
-	Var v={
+	Mem v={
 		.name=str_new(),
 		.type=0,
 	};
 	return v;
 }
 
-void var_free(Var*v)
+void mem_free(Mem*v)
 {
 	if(!v)return;
 	str_free(&v->name);

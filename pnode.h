@@ -5,6 +5,7 @@
 #include"str.h"
 #include"vec.h"
 #include"tok.h"
+#include"mem.h"
 
 //#define vec_pushn(v,n) do{PNode x=n;vec_push(v,&x);}while(0)
 
@@ -38,7 +39,7 @@ typedef struct Parser
 {
 	PNode root;
 	uint32_t mode;
-	Vec variables;
+	Vec mem_locations;
 } Parser;
 
 PNode pnode_new(void);

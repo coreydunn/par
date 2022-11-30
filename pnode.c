@@ -4,7 +4,7 @@
 #include"vec.h"
 #include"pnode.h"
 #include"tok.h"
-#include"var.h"
+#include"mem.h"
 #include"state.h"
 
 char*partype_names[]={"PNONE","PEMPTY","PEXPRESSION","PSTATEMENT","PASSIGNMENT","PIF","PCOMMENT","PBLOCK","PWHILE","PVARDECL","PFUNDECL","PRET",NULL};
@@ -14,7 +14,7 @@ Parser parser_new(void)
 	Parser p={
 		.root=pnode_new(),
 		.mode=0,
-		.variables=vec_new(sizeof(Var)),
+		.mem_locations=vec_new(sizeof(Mem)),
 	};
 	return p;
 }
@@ -22,9 +22,9 @@ Parser parser_new(void)
 void parser_free(Parser*p)
 {
 	pnode_free(&p->root);
-	for(size_t i=0;i<p->variables.size;++i)
-		var_free(&((Var*)p->variables.buffer)[i]);
-	vec_free(&p->variables);
+	for(size_t i=0;i<p->mem_locations.size;++i)
+		mem_free(&((Mem*)p->mem_locations.buffer)[i]);
+	vec_free(&p->mem_locations);
 }
 
 PNode pnode_new(void)
