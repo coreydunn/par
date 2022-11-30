@@ -17,7 +17,7 @@ Str str_new(void)
 
 void str_free(Str*s)
 {
-	if(!s)return;
+	if(!s){if(STRVERBOSE)fprintf(stderr,"str_free: NULL Str*\n");return;}
 	if(s->capacity)
 		free(s->buffer);
 	s->capacity=0;
@@ -27,7 +27,7 @@ void str_free(Str*s)
 
 void str_grow(Str*s,size_t n)
 {
-	if(!s)return;
+	if(!s){if(STRVERBOSE)fprintf(stderr,"str_grow: NULL Str*\n");return;}
 
 	if(!s->buffer)
 	{
@@ -38,7 +38,7 @@ void str_grow(Str*s,size_t n)
 	else
 		s->buffer=realloc(s->buffer,s->capacity+n);
 
-	if(!s->buffer)return;
+	if(!s->buffer){if(STRVERBOSE)fprintf(stderr,"str_grow: buffer is NULL after allocation\n");return;}
 	s->capacity=n;
 }
 
@@ -46,7 +46,7 @@ void str_assign(Str*s,char*c)
 {
 	size_t n;
 
-	if(!s)return;
+	if(!s){if(STRVERBOSE)fprintf(stderr,"str:str_assign: NULL Str*\n");return;}
 	n=strlen(c)+1;
 	if(s->capacity<n)
 		str_grow(s,n+STRDEFSIZE);
@@ -63,13 +63,13 @@ void str_append(Str*s,char*c)
 {
 	size_t n;
 
-	if(!s||!c)return;
+	if(!s){if(STRVERBOSE)fprintf(stderr,"str_append: NULL Str*\n");return;}
+	if(!c){if(STRVERBOSE)fprintf(stderr,"str_append: NULL char*\n");return;}
 
 	n=strlen(c)+1;
 	if(s->capacity<s->size+n)
 		str_grow(s,s->size+n+STRDEFSIZE);
-	if(!s->buffer)
-		return;
+	if(!s->buffer){if(STRVERBOSE)fprintf(stderr,"str_append: buffer is NULL after str_grow\n");return;}
 	strcat(s->buffer,c);
 	s->size+=n-1;
 
@@ -77,7 +77,7 @@ void str_append(Str*s,char*c)
 
 void str_tr(Str*s,char a,char b)
 {
-	if(!s)return;
+	if(!s){if(STRVERBOSE)fprintf(stderr,"str_tr: NULL Str*\n");return;}
 	for(size_t i=0;i<s->size;++i)
 		if(s->buffer[i]==a)
 			s->buffer[i]=b;
@@ -85,7 +85,7 @@ void str_tr(Str*s,char a,char b)
 
 void str_clear(Str*s)
 {
-	if(!s)return;
+	if(!s){if(STRVERBOSE)fprintf(stderr,"str_clear: NULL Str*\n");return;}
 	s->size=0;
 	if(s->buffer)
 		s->buffer[0]='\0';
@@ -188,10 +188,10 @@ Str str_basename(char*c)
 {
   Str s=str_new();
   char*p=NULL,*t=NULL;
-  if(!c)return s;
+  if(!c){if(STRVERBOSE)fprintf(stderr,"str_basename: NULL char*\n");return s;};
   
   str_assign(&s,c);
-  if(!s.buffer)return s;
+  if(!s.buffer){if(STRVERBOSE)fprintf(stderr,"str_basename: buffer NULL after str_assign\n");return s;}
   p=s.buffer;
   t=p;
 

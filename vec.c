@@ -49,8 +49,8 @@ void vec_free(Vec*v)
 
 void vec_grow(Vec*v)
 {
-	if(!v)return;
-	if(!v->unitsize)return;
+	if(!v){if(VECVERBOSE)fprintf(stderr,"vec_grow: NULL Vec*\n");return;}
+	if(!v->unitsize){if(VECVERBOSE)fprintf(stderr,"vec_grow: unitsize is zero\n");return;}
 	if(!v->buffer)
 		v->buffer=malloc(VECDEFSIZE*v->unitsize);
 	else
@@ -69,21 +69,21 @@ void vec_grow(Vec*v)
 
 void vec_push(Vec*v,void*d)
 {
-	if(!v)return;
-	if(!v->unitsize)return;
+	if(!v){if(VECVERBOSE)fprintf(stderr,"vec_push: NULL Vec*\n");return;}
+	if(!v->unitsize){if(VECVERBOSE)fprintf(stderr,"vec_push: unitsize is zero\n");return;}
 
 	if(!v->buffer||v->size+1>v->capacity)
 		vec_grow(v);
 
-	if(!v->buffer)return;
+	if(!v->buffer){if(VECVERBOSE)fprintf(stderr,"vec_push: NULL buffer after vec_grow\n");return;}
 	memcpy(v->buffer+(v->size)*v->unitsize,d,v->unitsize);
 	++v->size;
 }
 
 void vec_pop(Vec*v)
 {
-	if(!v)return;
-	if(!v->size)return;
+	if(!v){if(VECVERBOSE)fprintf(stderr,"vec_pop: NULL Vec*\n");return;}
+	if(!v->size){if(VECVERBOSE)fprintf(stderr,"vec_pop: size is zero\n");return;}
 	--v->size;
 }
 

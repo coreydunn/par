@@ -7,6 +7,7 @@
 #include"vec.h"
 
 #define VECDEFSIZE 64
+#define VECVERBOSE true
 
 #define vec_pushi(v,i) do{int x=i;vec_push((v),&x);}while(0)
 #define vec_pushc(v,c) do{char x=c;vec_push((v),&x);}while(0)

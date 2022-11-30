@@ -7,6 +7,7 @@
 #include<string.h>
 
 #define STRDEFSIZE 64
+#define STRVERBOSE true
 
 typedef struct Str
 {
