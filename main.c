@@ -7,6 +7,10 @@
 
 int main(int argc,char**argv)
 {
+	bool showparsetree=false;
+	bool showparsetreebrief=false;
+	bool showtokens=false;
+
 	//state=state_new();
 	Vec args=vec_new(sizeof(char*));
 
@@ -15,7 +19,63 @@ int main(int argc,char**argv)
 
 	// Determine string to lex/parse
 	for(int i=1;i<argc;++i)
+	{
+		if(!argv[i][0])continue;
+		if(argv[i][0]=='-')
+		{
+			if(argv[i][1]=='-')
+			{
+
+				// LONG OPTIONS
+				if(strcmp("--help",argv[i])==0)
+				{
+					puts("help yourself");
+					cleanquit(0);
+				}
+
+				else
+				{
+					err_log("unrecognized long option '%s'",argv[i]);
+					cleanquit(1);
+				}
+			}
+
+			// SHORT OPTIONS
+			else
+			{
+				for(size_t j=1;argv[i][j];++j)
+				{
+					switch(argv[i][j])
+					{
+
+						case 'p':
+							showparsetree=true;
+							break;
+
+						case 'b':
+							showparsetree=true;
+							showparsetreebrief=true;
+							break;
+
+						case 't':
+							showtokens=true;
+							break;
+
+						default:
+							err_log("unrecognized short option '%c'",argv[i][j]);
+							cleanquit(1);
+							break;
+
+					}
+				}
+			}
+
+			continue;
+		}
+
+		// All arguments otherwise treated as filenames
 		vec_push(&args,argv+i);
+	}
 
 	// Each file in vector
 	for(size_t i=0;i<args.size;++i)
@@ -44,11 +104,16 @@ int main(int argc,char**argv)
 		{
 			lex_string(&state.lexer,state.input_buffer.buffer);
 			str_free(&state.input_buffer);
-			//lex_print(&state.lexer);
+			if(showtokens)lex_print(&state.lexer);
 			parser_parse(&state.parser,&state.lexer.tokens);
 			lex_free(&state.lexer);
-			//pnode_print(&state.parser.root,0);
-			//pnode_print_brief(&state.parser.root,0);
+			if(showparsetree)
+			{
+				if(showparsetreebrief)
+					pnode_print_brief(&state.parser.root,0);
+				else
+					pnode_print(&state.parser.root,0);
+			}
 		}
 
 		{

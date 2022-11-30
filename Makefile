@@ -8,7 +8,7 @@ all: par
 par: main.o $(OBJS)
 	$(CC) $^ -o $@ $(LDFLAGS)
 %: %.par par
-	./par $^
+	./par $<
 	nasm -felf64 $*.asm -o $*.o
 	cc $*.o -o $@ -no-pie
 install_vimfiles:
