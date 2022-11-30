@@ -5,7 +5,7 @@
 #include<unistd.h>
 #include"state.h"
 
-#define HELPMSG "usage: par [-tpb] [--help] [FILES]"
+#define HELPMSG "usage: par [-htpb] [--help] [FILES]"
 
 int main(int argc,char**argv)
 {
@@ -61,6 +61,11 @@ int main(int argc,char**argv)
 
 						case 't':
 							showtokens=true;
+							break;
+
+						case 'h':
+							puts(HELPMSG);
+							cleanquit(0);
 							break;
 
 						default:
