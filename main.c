@@ -91,6 +91,7 @@ int main(int argc,char**argv)
 		// Read input file into buffer
 		if(state.infile)
 		{
+			state.infilename=((char**)args.buffer)[i];
 			char file_buffer[1024]={0};
 			size_t count=0;
 
@@ -106,6 +107,8 @@ int main(int argc,char**argv)
 		{
 			lex_string(&state.lexer,state.input_buffer.buffer);
 			str_free(&state.input_buffer);
+			if(showtokens||showparsetree)
+				printf("%s:\n",state.infilename);
 			if(showtokens)lex_print(&state.lexer);
 			parser_parse(&state.parser,&state.lexer.tokens);
 			lex_free(&state.lexer);

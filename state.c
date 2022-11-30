@@ -24,6 +24,7 @@ State state_new(void)
 		.input_buffer=str_new(),
 		.infile=stdin,
 		.outfile=NULL,
+		.infilename=NULL,
 	};
 	return st;
 }

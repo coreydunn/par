@@ -14,7 +14,7 @@
 #include"err.h"
 #include"x86_64.h"
 
-// State for par program
+// State for par source file
 typedef struct State
 {
 	Lexer lexer;
@@ -23,6 +23,7 @@ typedef struct State
 	Vec errors;
 	FILE*infile;
 	FILE*outfile;
+	char*infilename;
 } State;
 
 extern State state;
