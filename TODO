@@ -25,6 +25,8 @@ Parser
 
 Code Generator
 
-* Reverse Polish Notation expression evaluation
-* Handle state for source language (variables, functions, labels, etc.)
-* State for code generation
+* x86_64-linux ABI
+	- Stack frames
+	- Expression Evaluation (RPN)
+		> Memory locations
+		> Functions
