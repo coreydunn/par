@@ -3,6 +3,13 @@
 #include"x86_64.h"
 #include"state.h"
 
+/*TODO:
+ * We have to handle child nodes within the switch
+ * statement. This is so that prologs/epilogs can be
+ * closed around dependent nodes appropriately.
+ *****/
+void gen_x86_64_prolog(PNode*pn,FILE*file,size_t stacksize);
+
 void gen_x86_64(PNode*pn,FILE*file)
 {
 	size_t labelno=1;
@@ -14,6 +21,7 @@ void gen_x86_64(PNode*pn,FILE*file)
 	{
 
 		case PFUNDECL:
+			//gen_x86_64_prolog(pn,file,64);
 			fprintf(file,"global %s\n%s:\n",tokens[0].str.buffer,tokens[0].str.buffer);
 			break;
 
@@ -84,4 +92,23 @@ void gen_x86_64(PNode*pn,FILE*file)
 
 	for(size_t i=0;i<pn->pnodes.size;++i)
 		gen_x86_64(&((PNode*)pn->pnodes.buffer)[i],file);
+}
+
+void gen_x86_64_prolog(PNode*pn,FILE*file,size_t stacksize)
+{
+	if(!pn)
+	{
+		err_log("NULL PNode passed to gen_x86_64_prolog");
+		return;
+	}
+
+	if(!file)
+	{
+		err_log("NULL FILE* passed to gen_x86_64_prolog");
+		return;
+	}
+
+	fprintf(file,"push rbp\n");
+	fprintf(file,"mov rbp,rsp\n");
+	fprintf(file,"sub rsp,%lu\n",stacksize);
 }
