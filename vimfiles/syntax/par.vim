@@ -1,20 +1,20 @@
 " Vim syntax file
-" Language: Bob
+" Language: Par
 
 if exists("b:current_syntax")
 	finish
 endif
 
-"syntax match BobIdent	/[\a_]\+[\a\d_]*/
-syntax match BobComment	/#.*$/
-syntax match BobKeyword	/\(for\|while\|if\|ret\|let\|fn\|true\|false\)/
-syntax match BobInt		/\d\+/
-syntax match BobFloat	/\d\+\.\d\+/
-syntax match BobString	/"[^"]*"/
+"syntax match ParIdent		/[\a_]\+[\a\d_]*/
+syntax match ParComment		/#.*$/
+syntax keyword ParKeyword	for while if ret let fn true false
+syntax match ParInt			/\d\+/
+syntax match ParFloat		/\d\+\.\d\+/
+syntax match ParString		/"[^"]*"/
 
-"highlight BobIdent		ctermfg=brown guifg=#ff7700
-highlight BobComment	ctermfg=gray guifg=#ff0000
-highlight BobKeyword	ctermfg=yellow guifg=#ffff00
-highlight BobInt		ctermfg=darkblue guifg=#0000ee
-highlight BobFloat		ctermfg=darkred guifg=#ee0000
-highlight BobString		ctermfg=brown guifg=#ff7700
+"highlight ParIdent		ctermfg=brown guifg=#ff7700
+highlight ParComment	ctermfg=gray guifg=#ff0000
+highlight ParKeyword	ctermfg=yellow guifg=#ffff00
+highlight ParInt		ctermfg=darkblue guifg=#0000ee
+highlight ParFloat		ctermfg=darkred guifg=#ee0000
+highlight ParString		ctermfg=brown guifg=#ff7700
