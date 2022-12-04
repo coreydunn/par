@@ -9,6 +9,7 @@
  * closed around dependent nodes appropriately.
  *****/
 void gen_x86_64_prolog(PNode*pn,FILE*file,size_t stacksize);
+void gen_x86_64_epilog(PNode*pn,FILE*file,size_t stacksize);
 
 void gen_x86_64(PNode*pn,FILE*file)
 {
@@ -21,8 +22,11 @@ void gen_x86_64(PNode*pn,FILE*file)
 	{
 
 		case PFUNDECL:
-			//gen_x86_64_prolog(pn,file,64);
 			fprintf(file,"global %s\n%s:\n",tokens[0].str.buffer,tokens[0].str.buffer);
+			gen_x86_64_prolog(pn,file,64);
+			for(size_t i=0;i<pn->pnodes.size;++i)
+				gen_x86_64(&((PNode*)pn->pnodes.buffer)[i],file);
+			//gen_x86_64_epilog(pn,file,64);
 			break;
 
 		case PVARDECL:
@@ -47,6 +51,7 @@ void gen_x86_64(PNode*pn,FILE*file)
 			break;
 
 		case PRET:
+				gen_x86_64_epilog(pn,file,64);
 				if(pn->tokens.size>0)
 				{
 					if(tokens[0].type!=LINTEGER)
@@ -55,6 +60,15 @@ void gen_x86_64(PNode*pn,FILE*file)
 						fprintf(file,"\tmov eax,%s\n",tokens[0].str.buffer);
 				}
 				fprintf(file,"\tret\n");
+				/*****
+				 * IMPORTANT:
+				 * This return exits the (recursive)
+				 * code generation call and ceases
+				 * reading further PNodes belonging
+				 * to its parent node (i.e., on the
+				 * same level)!!
+				 *****/
+				return;
 			break;
 
 		case PIF:
@@ -75,6 +89,20 @@ void gen_x86_64(PNode*pn,FILE*file)
 				fprintf(file,"\t;%s\n",tokens[0].str.buffer);
 			break;
 
+		case PBLOCK:
+			for(size_t i=0;i<pn->pnodes.size;++i)
+				gen_x86_64(&((PNode*)pn->pnodes.buffer)[i],file);
+			break;
+
+		case PEMPTY:
+			// Root node, otherwise ignore
+			if(pn->parentnode==NULL)
+			{
+				for(size_t i=0;i<pn->pnodes.size;++i)
+					gen_x86_64(&((PNode*)pn->pnodes.buffer)[i],file);
+			}
+			break;
+
 		default:
 			if(pn->tokens.size>0)
 			{
@@ -90,8 +118,8 @@ void gen_x86_64(PNode*pn,FILE*file)
 			break;
 	}
 
-	for(size_t i=0;i<pn->pnodes.size;++i)
-		gen_x86_64(&((PNode*)pn->pnodes.buffer)[i],file);
+	//for(size_t i=0;i<pn->pnodes.size;++i)
+		//gen_x86_64(&((PNode*)pn->pnodes.buffer)[i],file);
 }
 
 void gen_x86_64_prolog(PNode*pn,FILE*file,size_t stacksize)
@@ -108,7 +136,26 @@ void gen_x86_64_prolog(PNode*pn,FILE*file,size_t stacksize)
 		return;
 	}
 
-	fprintf(file,"push rbp\n");
-	fprintf(file,"mov rbp,rsp\n");
-	fprintf(file,"sub rsp,%lu\n",stacksize);
+	fprintf(file,"\tpush rbp ; prolog\n");
+	fprintf(file,"\tmov rbp,rsp\n");
+	fprintf(file,"\tsub rsp,%lu\n",stacksize);
+}
+
+void gen_x86_64_epilog(PNode*pn,FILE*file,size_t stacksize)
+{
+	if(!pn)
+	{
+		err_log("NULL PNode passed to gen_x86_64_epilog");
+		return;
+	}
+
+	if(!file)
+	{
+		err_log("NULL FILE* passed to gen_x86_64_epilog");
+		return;
+	}
+
+	fprintf(file,"\tmov rsp,rbp ; epilog\n");
+	fprintf(file,"\tpop rbp\n");
+
 }
