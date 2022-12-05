@@ -10,7 +10,7 @@
 #include"err.h"
 #include"state.h"
 
-char*lextype_names[]={"LNONE","LIDENTIFIER","LINTEGER","LFLOAT","LSTRING","LOPERATOR","LKEYWORD","LCOMMENT",NULL};
+char*lextype_names[]={"LNONE","LIDENTIFIER","LINTEGER","LFLOAT","LSTRING","LOPERATOR","LKEYWORD","LCOMMENT","LMINUS",NULL};
 char*lextype_colors[]={"\033[0m","\033[0m","\033[36m","\033[35m","\033[32m","\033[0m","\033[33m","\033[34m"};
 char*lexsubtype_names[]={"LENDSTATEMENT","LASSIGN","LLPAREN","LRPAREN","LLCBRACE","LRCBRACE",NULL};
 static char*operator_chars="-+*/=;(),.{}<>";
@@ -115,6 +115,7 @@ void lex_string(Lexer*l,char*s)
 				initmatch("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_",LIDENTIFIER,true) else
 				initmatch("\"",LSTRING,false) else
 				initmatch("0123456789",LINTEGER,true) else
+				initmatch("-",LMINUS,true) else
 				initmatch(operator_chars,LOPERATOR,true) else
 				initmatch("#",LCOMMENT,true) else
 				if(strchr(" \t\n",s[i])){if(s[i]=='\n')++current_line;continue;} else
@@ -164,6 +165,32 @@ void lex_string(Lexer*l,char*s)
 							   modeterminate(false);
 						   }
 						   break;
+			case LMINUS://modematch("0123456789=",true,true);
+						printf("mode: %s\n",lextype_names[l->mode]);
+						printf("'%c'<<<\n",s[i]);
+						if(s[i]=='-')
+						{
+							ch[0]=s[i];str_append(&tmpstr,ch);
+						}
+						else if(strchr("0123456789",s[i]))
+						{
+							printf("'%s' is an int\n",
+									((Tok*)l->tokens.buffer)[l->tokens.size-1].str.buffer
+								  );
+							((Tok*)l->tokens.buffer)[l->tokens.size-1].type=LINTEGER;
+							l->mode=LINTEGER;
+							ch[0]=s[i];str_append(&tmpstr,ch);
+						}
+						else// if(s[i]=='=')
+						{
+							printf("'%s' is NOT an int\n",
+									((Tok*)l->tokens.buffer)[l->tokens.size-1].str.buffer
+								  );
+							((Tok*)l->tokens.buffer)[l->tokens.size-1].type=LOPERATOR;
+							l->mode=LOPERATOR;
+							modeterminate(true);
+						}
+						break;
 			case LCOMMENT:modematch("\n",true,true);break;
 
 		}

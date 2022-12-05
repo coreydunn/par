@@ -12,7 +12,7 @@
 
 #define vec_pushl(v,l) do{Tok x=l;vec_push(v,&x);}while(0)
 
-enum LEXTYPE {LNONE, LIDENTIFIER, LINTEGER, LFLOAT, LSTRING, LOPERATOR, LKEYWORD, LCOMMENT, };
+enum LEXTYPE {LNONE, LIDENTIFIER, LINTEGER, LFLOAT, LSTRING, LOPERATOR, LKEYWORD, LCOMMENT, LMINUS, };
 enum LEXSUBTYPE {LENDSTATEMENT=55, LASSIGN, LLPAREN, LRPAREN, LLCBRACE, LRCBRACE, };
 extern char*lextype_names[];
 extern char*lexsubtype_names[];
