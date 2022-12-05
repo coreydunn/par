@@ -22,6 +22,8 @@ void gen_x86_64(PNode*pn,FILE*file)
 	{
 
 		case PFUNDECL:
+			if(pn->parentnode&&pn->parentnode->parentnode!=NULL)
+				err_log("%u: function declaration within another structure",pn->firstline);
 			fprintf(file,"global %s\n%s:\n",tokens[0].str.buffer,tokens[0].str.buffer);
 			gen_x86_64_prolog(pn,file,0);
 			for(size_t i=0;i<pn->pnodes.size;++i)
