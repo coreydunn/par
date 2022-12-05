@@ -67,7 +67,7 @@ void lex_string(Lexer*l,char*s)
 		 * - Finalize current token lexing and set state to LNONE
 		 * keepch       bool      will we retain this character in the token string?
 		 *****/
-#define modeterminate(keepch) do{l->mode=LNONE;if(keepch)--i;str_assign(&((Tok*)l->tokens.buffer)[l->tokens.size-1].str,tmpstr.buffer);((Tok*)l->tokens.buffer)[l->tokens.size-1].line=current_line;}while(0)
+#define modeterminate(keepch) do{l->mode=LNONE;if(keepch)--i;str_assign(&((Tok*)l->tokens.buffer)[l->tokens.size-1].str,tmpstr.buffer);((Tok*)l->tokens.buffer)[l->tokens.size-1].line=current_line;ch[0]=s[i];str_append(&tmpstr,ch);}while(0)
 
 		/*****
 		 * modematch(chset,logic,keepch)
@@ -135,17 +135,34 @@ void lex_string(Lexer*l,char*s)
 			case LSTRING:modematch("\"",true,false);break;
 			case LOPERATOR:modematch(operator_chars,false,true);
 						   if(s[i]==';')
+						   {
 							   ((Tok*)l->tokens.buffer)[l->tokens.size-1].subtype=LENDSTATEMENT;
+							   modeterminate(false);
+						   }
 						   else if(s[i]=='='&&((Tok*)l->tokens.buffer)[l->tokens.size-1].str.size==1)
+						   {
 							   ((Tok*)l->tokens.buffer)[l->tokens.size-1].subtype=LASSIGN;
+						   }
 						   else if(s[i]=='(')
+						   {
 							   ((Tok*)l->tokens.buffer)[l->tokens.size-1].subtype=LLPAREN;
+							   modeterminate(false);
+						   }
 						   else if(s[i]==')')
+						   {
 							   ((Tok*)l->tokens.buffer)[l->tokens.size-1].subtype=LRPAREN;
+							   modeterminate(false);
+						   }
 						   else if(s[i]=='{')
+						   {
 							   ((Tok*)l->tokens.buffer)[l->tokens.size-1].subtype=LLCBRACE;
+							   modeterminate(false);
+						   }
 						   else if(s[i]=='}')
+						   {
 							   ((Tok*)l->tokens.buffer)[l->tokens.size-1].subtype=LRCBRACE;
+							   modeterminate(false);
+						   }
 						   break;
 			case LCOMMENT:modematch("\n",true,true);break;
 
