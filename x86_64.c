@@ -345,6 +345,7 @@ void gen_x86_64_eval(PNode*pn,FILE*file)
 	}
 	printf("]\n");
 
+	// Math
 	while(ops.size>0)
 	{
 		Tok op=((Tok*)ops.buffer)[ops.size-1];
@@ -355,23 +356,14 @@ void gen_x86_64_eval(PNode*pn,FILE*file)
 		const Tok i1=((Tok*)ints.buffer)[ints.size-1];
 		vec_pop(&ints);
 
-		//if(i1.type==LINTEGER && i2.type==LINTEGER)
-			//t;
+		{
+			Tok tmp={.type=LFAKE};
+			vec_push(&ints,&tmp);
+		}
 
 		printf("%s %s %s\n",op.str.buffer,
 				i1.str.buffer,
 				i2.str.buffer);
-
-		if(strcmp(op.str.buffer,"+")==0)
-			printf("add\n");
-		else if(strcmp(op.str.buffer,"-")==0)
-			printf("sub\n");
-		else if(strcmp(op.str.buffer,"*")==0)
-			printf("mul\n");
-		else if(strcmp(op.str.buffer,"/")==0)
-			printf("div\n");
-		else if(strcmp(op.str.buffer,"=")==0)
-			printf("mov\n");
 
 		vec_pop(&ops);
 		tok_free(&t);
