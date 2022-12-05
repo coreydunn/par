@@ -1,12 +1,15 @@
 CFLAGS=   -Wfatal-errors -Wall -Wextra
 LDFLAGS=  -s
-OBJS=     str.o tok.o vec.o lex.o pnode.o reg.o mem.o state.o err.o x86_64.o
+OBJS=     str.o tok.o vec.o lex.o pnode.o reg.o mem.o state.o err.o x86_64.o rpn.o
 PAR=      ./par
+LIB=      libpar.a
 
 all: par
 %.o: %.c %.h
 	$(CC) $< -c $(CFLAGS)
-par: main.o $(OBJS)
+libpar.a: $(OBJS)
+	ar rc $@ $^
+par: main.o libpar.a
 	$(CC) $^ -o $@ $(LDFLAGS)
 %.asm: %.par par
 	./par $<
@@ -20,4 +23,4 @@ install_vimfiles:
 	cp ./vimfiles/syntax/par.vim ~/.vim/syntax/
 	cp ./vimfiles/ftdetect/par.vim ~/.vim/ftdetect/
 clean:
-	$(RM) a.out *.o $(OBJS) par
+	$(RM) a.out *.o $(OBJS) par libpar.a
