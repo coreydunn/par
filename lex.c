@@ -140,9 +140,10 @@ void lex_string(Lexer*l,char*s)
 							   ((Tok*)l->tokens.buffer)[l->tokens.size-1].subtype=LENDSTATEMENT;
 							   modeterminate(false);
 						   }
-						   else if(s[i]=='='&&((Tok*)l->tokens.buffer)[l->tokens.size-1].str.size==1)
+						   else if(s[i]=='=')
 						   {
 							   ((Tok*)l->tokens.buffer)[l->tokens.size-1].subtype=LASSIGN;
+							   modeterminate(false);
 						   }
 						   else if(s[i]=='(')
 						   {
