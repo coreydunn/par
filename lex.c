@@ -12,7 +12,7 @@
 
 char*lextype_names[]={"LNONE","LIDENTIFIER","LINTEGER","LFLOAT","LSTRING","LOPERATOR","LKEYWORD","LCOMMENT","LMINUS",NULL};
 char*lextype_colors[]={"\033[0m","\033[0m","\033[36m","\033[35m","\033[32m","\033[0m","\033[33m","\033[34m"};
-char*lexsubtype_names[]={"LENDSTATEMENT","LASSIGN","LLPAREN","LRPAREN","LLCBRACE","LRCBRACE",NULL};
+char*lexsubtype_names[]={"LENDSTATEMENT","LASSIGN","LLPAREN","LRPAREN","LLCBRACE","LRCBRACE","LSMINUS",NULL};
 static char*operator_chars="-+*/=;(),.{}<>";
 static char*keywords[]={"do","false","fn","for","if","let","ret","true","while","call",};
 static char*operators[]={";","=","+=","-=","*=","/=","+","-","/","*","(",")","{","}"};
@@ -169,13 +169,10 @@ void lex_string(Lexer*l,char*s)
 			case LMINUS://modematch("0123456789=",true,true);
 						if(s[i]=='-')
 						{
+							((Tok*)l->tokens.buffer)[l->tokens.size-1].type=LOPERATOR;
+							((Tok*)l->tokens.buffer)[l->tokens.size-1].subtype=LSMINUS;
 							ch[0]=s[i];str_append(&tmpstr,ch);
-						}
-						else if(strchr("0123456789",s[i]))
-						{
-							((Tok*)l->tokens.buffer)[l->tokens.size-1].type=LINTEGER;
-							l->mode=LINTEGER;
-							ch[0]=s[i];str_append(&tmpstr,ch);
+							modeterminate(false);
 						}
 						else// if(s[i]=='=')
 						{

@@ -56,8 +56,17 @@ void gen_x86_64(PNode*pn,FILE*file)
 				gen_x86_64_epilog(pn,file);
 				if(pn->tokens.size>0)
 				{
-					if(tokens[0].type!=LINTEGER)
+					if(tokens[0].type==LOPERATOR&&tokens[0].subtype==LSMINUS)
+					{
+						if(pn->tokens.size<2)
+							err_log("%u: expected integer",tokens[0].line);
+						else
+							fprintf(file,"\tmov eax,-%s\n",tokens[1].str.buffer);
+					}
+					else if(tokens[0].type!=LINTEGER)
+					{
 						err_log("%u: returning non-integer",tokens[0].line);
+					}
 					else
 						fprintf(file,"\tmov eax,%s\n",tokens[0].str.buffer);
 				}
