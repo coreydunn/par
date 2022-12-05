@@ -13,8 +13,9 @@
 char*lextype_names[]={"LNONE","LIDENTIFIER","LINTEGER","LFLOAT","LSTRING","LOPERATOR","LKEYWORD","LCOMMENT",NULL};
 char*lextype_colors[]={"\033[0m","\033[0m","\033[36m","\033[35m","\033[32m","\033[0m","\033[33m","\033[34m"};
 char*lexsubtype_names[]={"LENDSTATEMENT","LASSIGN","LLPAREN","LRPAREN","LLCBRACE","LRCBRACE",NULL};
-static char*operators="-+*/=;(),.{}<>";
+static char*operator_chars="-+*/=;(),.{}<>";
 static char*keywords[]={"do","false","fn","for","if","let","ret","true","while","call",};
+static char*operators[]={";","=","+=","-=","*=","/=","+","-","/","*","(",")","{","}"};
 
 Lexer lex_new(void)
 {
@@ -48,7 +49,7 @@ void lex_string(Lexer*l,char*s)
 	strl=strlen(s);
 
 	// Read each individual byte
-	for(size_t i=0;i<strl;++i)
+	for(size_t i=0;i<strl+1;++i)
 	{
 
 		/*****
@@ -57,9 +58,16 @@ void lex_string(Lexer*l,char*s)
 		 * - clear tmpstr and initialize new token
 		 * chset        char*     set of characters which s[i] must match
 		 * mode         uint32_t  change lexer mode to this
-		 * keepch    bool      will we retain this character in the token string?
+		 * keepch       bool      will we retain this character in the token string?
 		 *****/
 #define initmatch(chset,lmode,keepch) if(s[i]&&memchr((chset),s[i],strlen((chset)))){l->mode=(lmode);if(keepch)--i;vec_pushl(&l->tokens,((Tok){.str=str_new(),.type=l->mode,.line=current_line}));str_clear(&tmpstr);}
+
+		/*****
+		 * modeterminate
+		 * - Finalize current token lexing and set state to LNONE
+		 * keepch       bool      will we retain this character in the token string?
+		 *****/
+#define modeterminate(keepch) do{l->mode=LNONE;if(keepch)--i;str_assign(&((Tok*)l->tokens.buffer)[l->tokens.size-1].str,tmpstr.buffer);((Tok*)l->tokens.buffer)[l->tokens.size-1].line=current_line;}while(0)
 
 		/*****
 		 * modematch(chset,logic,keepch)
@@ -69,25 +77,45 @@ void lex_string(Lexer*l,char*s)
 		 * logic        bool      if false, only modify current token when s[i] does NOT match chset
 		 * keepch       bool      will we retain this character in the token string?
 		 *****/
-#define modematch(chset,logic,keepch) do{if(!s[i]||(logic==(!!memchr((chset),s[i],strlen(chset)))) ){l->mode=LNONE;if(keepch)--i;str_assign(&((Tok*)l->tokens.buffer)[l->tokens.size-1].str,tmpstr.buffer);((Tok*)l->tokens.buffer)[l->tokens.size-1].line=current_line;}ch[0]=s[i];str_append(&tmpstr,ch);}while(0)
+#define modematch(chset,logic,keepch) do{if(!s[i]||(logic==(!!memchr((chset),s[i],strlen(chset)))) ){modeterminate(keepch);}ch[0]=s[i];str_append(&tmpstr,ch);}while(0)
 
 		switch(l->mode)
 		{
 
 			// New lexeme boundary
 			// Starting condition
+
 			/*****
 			 * When we find a new lexeme,
 			 * push a new Tok to the vector
 			 * and set its type to the Lexer
 			 * mode and initialize its str
 			 *****/
+
 			case LNONE:
+				// Extra step: turn identifiers into keywords
+				if(l->tokens.size)
+				{
+					Tok*lasttok=&((Tok*)l->tokens.buffer)[l->tokens.size-2];
+					if(lasttok->type==LIDENTIFIER)
+					{
+						for(size_t j=0;j<sizeof(keywords)/sizeof(char*);++j)
+							if(strcmp(keywords[j],lasttok->str.buffer)==0)
+								lasttok->type=LKEYWORD;
+					}
+				}
+				/* !! FALL THROUGH !! */
 			default:
+
+				// We go past the strl by one to
+				// make sure the fixup stage (above)
+				// always gets called
+				if(i>=strl)break;
+
 				initmatch("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_",LIDENTIFIER,true) else
 				initmatch("\"",LSTRING,false) else
 				initmatch("0123456789",LINTEGER,true) else
-				initmatch(operators,LOPERATOR,true) else
+				initmatch(operator_chars,LOPERATOR,true) else
 				initmatch("#",LCOMMENT,true) else
 				if(strchr(" \t\n",s[i])){if(s[i]=='\n')++current_line;continue;} else
 				err_log("%u: unrecognized character '%c' (%x)",current_line,((s[i]>32)?(s[i]):(' ')),s[i]);
@@ -95,11 +123,7 @@ void lex_string(Lexer*l,char*s)
 				break;
 
 			// Individual modes
-			case LIDENTIFIER:modematch("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789",false,true);
-							for(size_t j=0;j<sizeof(keywords)/sizeof(char*);++j)
-								if(strcmp(keywords[j],tmpstr.buffer)==0)
-									((Tok*)l->tokens.buffer)[l->tokens.size-1].type=LKEYWORD;
-							break;
+			case LIDENTIFIER:modematch("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789",false,true);break;
 			case LFLOAT:modematch("0123456789",false,true);break;
 			case LINTEGER:modematch("0123456789.",false,true);
 						 if(s[i]=='.')
@@ -109,25 +133,26 @@ void lex_string(Lexer*l,char*s)
 						 }
 						 break;
 			case LSTRING:modematch("\"",true,false);break;
-			case LOPERATOR:modematch(operators,false,true);
-						  if(s[i]==';')
-							  ((Tok*)l->tokens.buffer)[l->tokens.size-1].subtype=LENDSTATEMENT;
-						  else if(s[i]=='='&&((Tok*)l->tokens.buffer)[l->tokens.size-1].str.size==1)
-							  ((Tok*)l->tokens.buffer)[l->tokens.size-1].subtype=LASSIGN;
+			case LOPERATOR:modematch(operator_chars,false,true);
+						   if(s[i]==';')
+							   ((Tok*)l->tokens.buffer)[l->tokens.size-1].subtype=LENDSTATEMENT;
+						   else if(s[i]=='='&&((Tok*)l->tokens.buffer)[l->tokens.size-1].str.size==1)
+							   ((Tok*)l->tokens.buffer)[l->tokens.size-1].subtype=LASSIGN;
 						   else if(s[i]=='(')
-							  ((Tok*)l->tokens.buffer)[l->tokens.size-1].subtype=LLPAREN;
+							   ((Tok*)l->tokens.buffer)[l->tokens.size-1].subtype=LLPAREN;
 						   else if(s[i]==')')
-							  ((Tok*)l->tokens.buffer)[l->tokens.size-1].subtype=LRPAREN;
+							   ((Tok*)l->tokens.buffer)[l->tokens.size-1].subtype=LRPAREN;
 						   else if(s[i]=='{')
-							  ((Tok*)l->tokens.buffer)[l->tokens.size-1].subtype=LLCBRACE;
+							   ((Tok*)l->tokens.buffer)[l->tokens.size-1].subtype=LLCBRACE;
 						   else if(s[i]=='}')
-							  ((Tok*)l->tokens.buffer)[l->tokens.size-1].subtype=LRCBRACE;
-						  break;
+							   ((Tok*)l->tokens.buffer)[l->tokens.size-1].subtype=LRCBRACE;
+						   break;
 			case LCOMMENT:modematch("\n",true,true);break;
 
 		}
 #undef initmatch
 #undef modematch
+#undef modeterminate
 	}
 
 	str_free(&tmpstr);
