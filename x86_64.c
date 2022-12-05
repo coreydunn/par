@@ -86,7 +86,7 @@ void gen_x86_64(PNode*pn,FILE*file)
 				if(pn->tokens.size>1)
 					fprintf(file,"\tcmp eax,0 ;%s\n",tokens[1].str.buffer);
 				fprintf(file,"\tjz .L%02lu\n",++labelno);
-				fprintf(file,".L%02lu\n",labelno);
+				fprintf(file,".L%02lu:\n",labelno);
 			break;
 
 		case PWHILE:
