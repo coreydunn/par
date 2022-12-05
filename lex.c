@@ -166,26 +166,18 @@ void lex_string(Lexer*l,char*s)
 						   }
 						   break;
 			case LMINUS://modematch("0123456789=",true,true);
-						printf("mode: %s\n",lextype_names[l->mode]);
-						printf("'%c'<<<\n",s[i]);
 						if(s[i]=='-')
 						{
 							ch[0]=s[i];str_append(&tmpstr,ch);
 						}
 						else if(strchr("0123456789",s[i]))
 						{
-							printf("'%s' is an int\n",
-									((Tok*)l->tokens.buffer)[l->tokens.size-1].str.buffer
-								  );
 							((Tok*)l->tokens.buffer)[l->tokens.size-1].type=LINTEGER;
 							l->mode=LINTEGER;
 							ch[0]=s[i];str_append(&tmpstr,ch);
 						}
 						else// if(s[i]=='=')
 						{
-							printf("'%s' is NOT an int\n",
-									((Tok*)l->tokens.buffer)[l->tokens.size-1].str.buffer
-								  );
 							((Tok*)l->tokens.buffer)[l->tokens.size-1].type=LOPERATOR;
 							l->mode=LOPERATOR;
 							modeterminate(true);
