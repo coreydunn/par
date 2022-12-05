@@ -9,7 +9,7 @@
  * closed around dependent nodes appropriately.
  *****/
 void gen_x86_64_prolog(PNode*pn,FILE*file,size_t stacksize);
-void gen_x86_64_epilog(PNode*pn,FILE*file,size_t stacksize);
+void gen_x86_64_epilog(PNode*pn,FILE*file);
 
 void gen_x86_64(PNode*pn,FILE*file)
 {
@@ -23,10 +23,10 @@ void gen_x86_64(PNode*pn,FILE*file)
 
 		case PFUNDECL:
 			fprintf(file,"global %s\n%s:\n",tokens[0].str.buffer,tokens[0].str.buffer);
-			gen_x86_64_prolog(pn,file,64);
+			gen_x86_64_prolog(pn,file,0);
 			for(size_t i=0;i<pn->pnodes.size;++i)
 				gen_x86_64(&((PNode*)pn->pnodes.buffer)[i],file);
-			//gen_x86_64_epilog(pn,file,64);
+			//gen_x86_64_epilog(pn,file);
 			break;
 
 		case PVARDECL:
@@ -38,11 +38,11 @@ void gen_x86_64(PNode*pn,FILE*file)
 			else if(pn->tokens.size==0)
 				err_log("%u: expected identifier",pn->firstline);
 
-
+			fprintf(file,"\tsub rsp,%lu\n",4lu);
 			if(pn->tokens.size>2)
 			{
 				if(tokens[1].type==LOPERATOR&&tokens[1].str.buffer[0]=='=')
-					fprintf(file,"\tmov eax,%s ;%s\n",tokens[2].str.buffer,tokens[0].str.buffer);
+					fprintf(file,"\tmov dword[rsp],%s ;%s\n",tokens[2].str.buffer,tokens[0].str.buffer);
 			}
 			else if(pn->tokens.size>0)
 			{
@@ -51,7 +51,7 @@ void gen_x86_64(PNode*pn,FILE*file)
 			break;
 
 		case PRET:
-				gen_x86_64_epilog(pn,file,64);
+				gen_x86_64_epilog(pn,file);
 				if(pn->tokens.size>0)
 				{
 					if(tokens[0].type!=LINTEGER)
@@ -141,7 +141,7 @@ void gen_x86_64_prolog(PNode*pn,FILE*file,size_t stacksize)
 	fprintf(file,"\tsub rsp,%lu\n",stacksize);
 }
 
-void gen_x86_64_epilog(PNode*pn,FILE*file,size_t stacksize)
+void gen_x86_64_epilog(PNode*pn,FILE*file)
 {
 	if(!pn)
 	{
