@@ -23,7 +23,7 @@ void gen_x86_64(PNode*pn,FILE*file)
 
 		case PFUNDECL:
 			if(pn->parentnode&&pn->parentnode->parentnode!=NULL)
-				err_log("%u: function declaration within another structure",pn->firstline);
+				err_log("%u: nested function declaration",pn->firstline);
 			fprintf(file,"global %s\n%s:\n",tokens[0].str.buffer,tokens[0].str.buffer);
 			gen_x86_64_prolog(pn,file,0);
 			for(size_t i=0;i<pn->pnodes.size;++i)
@@ -71,6 +71,15 @@ void gen_x86_64(PNode*pn,FILE*file)
 				 * same level)!!
 				 *****/
 				return;
+			break;
+
+		case PCALL:
+			if(pn->tokens.size<1)
+			{
+				err_log("%u: expected function name after 'call'",tokens[0].line);
+				break;
+			}
+			fprintf(file,"\tcall %s\n",tokens[0].str.buffer);
 			break;
 
 		case PIF:

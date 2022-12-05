@@ -7,7 +7,7 @@
 #include"mem.h"
 #include"state.h"
 
-char*partype_names[]={"PNONE","PEMPTY","PEXPRESSION","PSTATEMENT","PASSIGNMENT","PIF","PCOMMENT","PBLOCK","PWHILE","PVARDECL","PFUNDECL","PRET",NULL};
+char*partype_names[]={"PNONE","PEMPTY","PEXPRESSION","PSTATEMENT","PASSIGNMENT","PIF","PCOMMENT","PBLOCK","PWHILE","PVARDECL","PFUNDECL","PRET","PCALL",NULL};
 
 Parser parser_new(void)
 {
@@ -176,6 +176,7 @@ void parser_parse(Parser*p,Vec*t)
 						else if(strcmp("while",cur_tok->str.buffer)==0){globalcode();++i;descend(PWHILE);}
 						else if(strcmp("let",cur_tok->str.buffer)==0){globalcode();++i;descend(PVARDECL);}
 						else if(strcmp("fn",cur_tok->str.buffer)==0){++i;descend(PFUNDECL);}
+						else if(strcmp("call",cur_tok->str.buffer)==0){++i;descend(PCALL);}
 						break;
 
 					case LOPERATOR:
@@ -231,6 +232,11 @@ void parser_parse(Parser*p,Vec*t)
 				pushcurrenttoken();
 				break;
 
+			case PCALL:
+				checktypesub(LOPERATOR,LENDSTATEMENT){p->mode=PNONE;break;}
+				pushcurrenttoken();
+				break;
+
 			case PFUNDECL:
 				checktypesub(LOPERATOR,LENDSTATEMENT){p->mode=PNONE;break;}
 				checktypesub(LOPERATOR,LLCBRACE){p->mode=PBLOCK;descend(PEXPRESSION);break;}
@@ -261,6 +267,7 @@ void parser_parse(Parser*p,Vec*t)
 					else if(strcmp("let",cur_tok->str.buffer)==0){p->mode=PVARDECL;current_node->type=PVARDECL;break;}
 					else if(strcmp("ret",cur_tok->str.buffer)==0){p->mode=PRET;current_node->type=PRET;break;}
 					else if(strcmp("fn",cur_tok->str.buffer)==0){p->mode=PFUNDECL;current_node->type=PFUNDECL;break;}
+					else if(strcmp("call",cur_tok->str.buffer)==0){p->mode=PCALL;current_node->type=PCALL;break;}
 				}
 				pushcurrenttoken();
 				//vec_pushta(&current_node->tokens,);

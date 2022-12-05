@@ -7,7 +7,7 @@ endif
 
 "syntax match ParIdent		/[\a_]\+[\a\d_]*/
 syntax match ParComment		/#.*$/
-syntax keyword ParKeyword	for while if ret let fn true false
+syntax keyword ParKeyword	for while if ret let fn true false call
 syntax match ParInt			/\d\+/
 syntax match ParFloat		/\d\+\.\d\+/
 syntax match ParString		/"[^"]*"/
