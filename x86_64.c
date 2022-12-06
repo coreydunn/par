@@ -16,7 +16,18 @@ void gen_x86_64(PNode*pn,FILE*file)
 	size_t labelno=1;
 	Tok*tokens=(Tok*)pn->tokens.buffer;
 
-	if(!file)return;
+	if(!pn)
+	{
+		err_log("passed NULL PNode to gen_x86_64");
+		return;
+	}
+
+	if(!file)
+	{
+		err_log("NULL FILE* passed to gen_x86_64");
+		return;
+	}
+
 
 	switch(pn->type)
 	{
@@ -123,7 +134,9 @@ void gen_x86_64(PNode*pn,FILE*file)
 			}
 			break;
 
+		case PEXPRESSION:
 		default:
+			gen_x86_64_eval(pn,file);
 			if(pn->tokens.size>0)
 			{
 				fprintf(file,";PNODE ID: %s ",partype_names[pn->type]);
@@ -178,4 +191,184 @@ void gen_x86_64_epilog(PNode*pn,FILE*file)
 	fprintf(file,"\tmov rsp,rbp ; epilog\n");
 	fprintf(file,"\tpop rbp\n");
 
+}
+
+// Evaluate expression using RPN algorithm
+void gen_x86_64_eval2(PNode*pn,FILE*file)
+{
+	Vec ints=vec_new(sizeof(Tok*));
+	Vec ops=vec_new(sizeof(Tok*));
+	Tok*tokens=NULL;
+
+	if(!pn)
+	{
+		err_log("passed NULL PNode to gen_x86_64_eval");
+		return;
+	}
+
+	if(!file)
+	{
+		err_log("NULL FILE* passed to gen_x86_64_eval");
+		return;
+	}
+
+	tokens=((Tok*)pn->tokens.buffer);
+
+	//printf("gen_x86_64_eval: %p [",tokens);
+	for(size_t i=0;i<pn->tokens.size;++i)
+	{
+		//printf("'%s' ",tokens[i].str.buffer);
+
+		switch(tokens[i].type)
+		{
+			case LIDENTIFIER:
+			case LINTEGER:vec_push(&ints,tokens+i);break;
+			case LOPERATOR:
+				vec_push(&ops,tokens+i);
+				break;
+			  //{
+				  //while(ops.size>0)
+				  //{
+//
+					  //// Perform evaluation of 2 ints and
+					  //// 1 operator
+					  //for(size_t j=0;j<ops.size;++j)
+					  //{
+						  //Tok*x=NULL,*y=NULL;
+//
+						  //// Pop 2 ints
+						  //x=&((Tok*)ints.buffer)[ints.size-1];
+						  //vec_pop(&ints);
+						  //y=&((Tok*)ints.buffer)[ints.size-1];
+						  //vec_pop(&ints);
+//
+						  //printf("gen_x86_64_eval: '%s' %s '%s'\n",
+								  //x->str.buffer,
+								  //((Tok*)ops.buffer)[j].str.buffer,
+								  //y->str.buffer
+								  //);
+//
+						  //vec_pop(&ops);
+//
+					  //}
+				  //}
+				  //vec_push(&ops,tokens+i);
+				  //break;
+			  //}
+			default:break;
+		}
+
+	}
+	//printf("]\n");
+
+	// Print vectors
+	printf("ints: ");
+	for(size_t i=0;i<ints.size;++i)
+		printf("'%s'(%s), ",
+				((Tok*)ints.buffer)[i].str.buffer,
+				lextype_names[((Tok*)ints.buffer)[i].type]
+				);
+	printf("\n");
+
+	printf("ops: ");
+	for(size_t i=0;i<ops.size;++i)
+		printf("'%s'(%s), ",
+				((Tok*)ops.buffer)[i].str.buffer,
+				lextype_names[((Tok*)ops.buffer)[i].type]
+				);
+	printf("\n");
+
+	vec_free(&ints);
+	vec_free(&ops);
+}
+
+void gen_x86_64_eval(PNode*pn,FILE*file)
+{
+	Vec ints=vec_new(sizeof(Tok));
+	Vec ops=vec_new(sizeof(Tok));
+	Tok*tokens=NULL;
+
+	if(!pn)
+	{
+		err_log("passed NULL PNode to gen_x86_64_eval");
+		return;
+	}
+
+	if(!file)
+	{
+		err_log("NULL FILE* passed to gen_x86_64_eval");
+		return;
+	}
+
+	tokens=((Tok*)pn->tokens.buffer);
+
+	for(size_t i=0;i<pn->tokens.size;++i)
+	{
+		switch(tokens[i].type)
+		{
+
+			case LINTEGER:
+			case LIDENTIFIER:
+				{
+					Tok tmp=tokens[i];
+					vec_push(&ints,&tmp);
+				}
+				break;
+
+			case LOPERATOR:
+				{
+					Tok tmp=tokens[i];
+					vec_push(&ops,&tmp);
+				}
+				break;
+			default:
+				break;
+
+		}
+	}
+
+	printf("ints: [");
+	for(size_t i=0;i<ints.size;++i)
+	{
+		printf("'%s'",((Tok*)ints.buffer)[i].str.buffer);
+		if(i<ints.size-1)
+			printf(", ");
+	}
+	printf("]\n");
+
+	printf("ops: %p [",&ops);
+	for(size_t i=0;i<ops.size;++i)
+	{
+		printf("'%s'",((Tok*)ops.buffer)[i].str.buffer);
+		if(i<ops.size-1)
+			printf(", ");
+	}
+	printf("]\n");
+
+	// Math
+	while(ops.size>0)
+	{
+		Tok op=((Tok*)ops.buffer)[ops.size-1];
+		Tok t=tok_new();
+
+		const Tok i2=((Tok*)ints.buffer)[ints.size-1];
+		vec_pop(&ints);
+		const Tok i1=((Tok*)ints.buffer)[ints.size-1];
+		vec_pop(&ints);
+
+		{
+			Tok tmp={.type=LFAKE};
+			vec_push(&ints,&tmp);
+		}
+
+		printf("%s %s %s\n",op.str.buffer,
+				i1.str.buffer,
+				i2.str.buffer);
+
+		vec_pop(&ops);
+		tok_free(&t);
+	}
+
+	vec_free(&ints);
+	vec_free(&ops);
 }
