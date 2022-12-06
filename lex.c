@@ -137,15 +137,28 @@ void lex_string(Lexer*l,char*s)
 			case LOPERATOR:modematch(operator_chars,false,true);
 						   switch(s[i])
 						   {
-#define opmatch(lstype) do{((Tok*)l->tokens.buffer)[l->tokens.size-1].subtype=lstype;modeterminate(false);}while(0)
-							   case ';':opmatch(LENDSTATEMENT);break;
-							   case '=':opmatch(LASSIGN);break;
-							   case '(':opmatch(LLPAREN);break;
-							   case ')':opmatch(LRPAREN);break;
-							   case '{':opmatch(LLCBRACE);break;
-							   case '}':opmatch(LRCBRACE);break;
+#define opmatch(lstype,keepch) do{((Tok*)l->tokens.buffer)[l->tokens.size-1].subtype=lstype;modeterminate(keepch);}while(0)
+#define opmatch_nodup(lstype,keepch) do{l->mode=LNONE;((Tok*)l->tokens.buffer)[l->tokens.size-1].line=current_line;ch[0]=s[i];str_append(&tmpstr,ch);}while(0)
+							   case ';':opmatch(LENDSTATEMENT,false);break;
+							   case '(':opmatch(LLPAREN,false);break;
+							   case ')':opmatch(LRPAREN,false);break;
+							   case '{':opmatch(LLCBRACE,false);break;
+							   case '}':opmatch(LRCBRACE,false);break;
+							   case '*':opmatch(0,false);break;
+							   case '=':
+										{
+											char*ss=((Tok*)l->tokens.buffer)[l->tokens.size-1].str.buffer;
+											if(!ss)break;
+											if(strcmp("==",ss)==0)opmatch_nodup(0,false);
+											else if(strcmp("+=",ss)==0)opmatch_nodup(LASSIGN,false);
+											else if(strcmp("-=",ss)==0)opmatch_nodup(LASSIGN,false);
+											else if(strcmp("*=",ss)==0)opmatch_nodup(LASSIGN,false);
+											else if(strcmp("/=",ss)==0)opmatch_nodup(LASSIGN,false);
+										}
+										break;
 							   default:break;
 #undef opmatch
+#undef opmatch_nodup
 						   }
 						   break;
 			case LMINUS://modematch("0123456789=",true,true);
