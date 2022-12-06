@@ -135,35 +135,17 @@ void lex_string(Lexer*l,char*s)
 						 break;
 			case LSTRING:modematch("\"",true,false);break;
 			case LOPERATOR:modematch(operator_chars,false,true);
-						   if(s[i]==';')
+						   switch(s[i])
 						   {
-							   ((Tok*)l->tokens.buffer)[l->tokens.size-1].subtype=LENDSTATEMENT;
-							   modeterminate(false);
-						   }
-						   else if(s[i]=='=')
-						   {
-							   ((Tok*)l->tokens.buffer)[l->tokens.size-1].subtype=LASSIGN;
-							   modeterminate(false);
-						   }
-						   else if(s[i]=='(')
-						   {
-							   ((Tok*)l->tokens.buffer)[l->tokens.size-1].subtype=LLPAREN;
-							   modeterminate(false);
-						   }
-						   else if(s[i]==')')
-						   {
-							   ((Tok*)l->tokens.buffer)[l->tokens.size-1].subtype=LRPAREN;
-							   modeterminate(false);
-						   }
-						   else if(s[i]=='{')
-						   {
-							   ((Tok*)l->tokens.buffer)[l->tokens.size-1].subtype=LLCBRACE;
-							   modeterminate(false);
-						   }
-						   else if(s[i]=='}')
-						   {
-							   ((Tok*)l->tokens.buffer)[l->tokens.size-1].subtype=LRCBRACE;
-							   modeterminate(false);
+#define opmatch(lstype) do{((Tok*)l->tokens.buffer)[l->tokens.size-1].subtype=lstype;modeterminate(false);}while(0)
+							   case ';':opmatch(LENDSTATEMENT);break;
+							   case '=':opmatch(LASSIGN);break;
+							   case '(':opmatch(LLPAREN);break;
+							   case ')':opmatch(LRPAREN);break;
+							   case '{':opmatch(LLCBRACE);break;
+							   case '}':opmatch(LRCBRACE);break;
+							   default:break;
+#undef opmatch
 						   }
 						   break;
 			case LMINUS://modematch("0123456789=",true,true);
