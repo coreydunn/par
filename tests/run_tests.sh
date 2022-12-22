@@ -18,9 +18,9 @@ assert()
 	if [ -e $1 ]; then
 		$("./$1")
 		if [ $? = 0 ]; then
-			printf "$c_green""$?\n""$c_normal"
+			printf "$c_green""OK\n""$c_normal"
 		else
-			printf "$c_red""$?\n""$c_normal"
+			printf "$c_red""FAIL""$c_normal"" ($?)\n"
 		fi
 	else
 		printf "$c_red""test not built\n""$c_normal"
