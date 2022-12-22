@@ -1,0 +1,10 @@
+fn f()
+{
+	ret 55;
+}
+
+fn main()
+{
+	let x=0;
+	ret 6;
+}

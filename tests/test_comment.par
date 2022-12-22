@@ -1,0 +1,6 @@
+fn main() # entry point
+{
+	let name; # string
+	name="this is a string"; # assignment
+	ret 0; # return value
+}

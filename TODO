@@ -27,7 +27,7 @@ Parser
 Code Generator
 
 * x86_64-linux ABI
-	- Stack frames
+	- Stack frames [DONE]
 	- Expression Evaluation (RPN)
 		> Memory locations
 		> Functions
