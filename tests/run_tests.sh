@@ -17,7 +17,11 @@ assert()
 	printf "$c_yellow""$1""$c_normal"" => "
 	if [ -e $1 ]; then
 		$("./$1")
-		printf "$c_green""$?\n""$c_normal"
+		if [ $? = 0 ]; then
+			printf "$c_green""$?\n""$c_normal"
+		else
+			printf "$c_red""$?\n""$c_normal"
+		fi
 	else
 		printf "$c_red""test not built\n""$c_normal"
 	fi

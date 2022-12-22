@@ -5,6 +5,7 @@ fn f()
 
 fn main()
 {
-	let x=0;
-	ret 6;
+	let x=65536;
+	call f();
+	ret 0;
 }
