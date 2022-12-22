@@ -1,4 +1,5 @@
 fn main()
 {
 	let x=22;
+	ret 0;
 }
