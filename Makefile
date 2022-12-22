@@ -7,6 +7,12 @@ TESTOBJS= $(basename $(shell ls tests/*.par))
 
 .PHONY: FORCE
 all: par
+help:
+	@printf "Targets\n"
+	@printf "  all                Build par (default)\n"
+	@printf "  clean              Remove build files\n"
+	@printf "  tests              Build and run tests\n"
+	@printf "  install_vimfiles   Install syntax files in ~/.vim/\n"
 %.o: %.c %.h
 	$(CC) $< -c $(CFLAGS)
 libpar.a: $(OBJS)
