@@ -2,7 +2,7 @@ CFLAGS=   -Wfatal-errors -Wall -Wextra
 LDFLAGS=  -s
 OBJS=     str.o tok.o vec.o lex.o pnode.o reg.o mem.o state.o err.o x86_64.o rpn.o
 LIB=      libpar.a
-TESTS=    $(basename $(shell ls tests/*.par))
+TESTS=    $(basename $(shell ls tests/test_*.par))
 
 .PHONY: FORCE
 all: par

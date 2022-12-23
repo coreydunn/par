@@ -35,7 +35,7 @@ test_program()
 main()
 {
 	[ $# -gt 0 ] && cd $1
-	for x in *.par; do
+	for x in test_*.par; do
 		test_program "$(basename --suffix .par $x)"
 	done
 }
